@@ -54,6 +54,36 @@ define ( "SM_CATEGORY_LEVEL_2", "sm.категория.2", true );
 define ( "SM_CATEGORY_LEVEL_3", "sm.категория.3", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 
+class GetAvailableDocuments {
+  public function __construct($email, $password) {
+    //
+    try {
+      $client = Zend_Gdata_ClientLogin::getHttpClient ( $email, $password, Zend_Gdata_Spreadsheets::AUTH_SERVICE_NAME );
+    } catch ( Zend_Gdata_App_AuthException $ae ) {
+      exit ( "Error: " . $ae->getMessage () . "\nCredentials provided were email: [$email] and password [$password].\n" );
+    }
+    
+    $this->gdClient = new Zend_Gdata_Spreadsheets ( $client );
+  
+  }
+  
+  public function getDocsArray() {
+    $res = array ();
+    
+    $feed = $this->gdClient->getSpreadsheetFeed ();
+    
+    //$i = 0;
+    foreach ( $feed->entries as $entry ) {
+      //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
+      $res [$entry->title->text] [URL] = $entry->id->text;
+      $res [$entry->title->text] [NAME] = $entry->title->text;
+      //$i ++;
+    }
+    
+    return $res;
+  }
+
+}
 /**
  * SimpleCRUD
  *
@@ -87,6 +117,11 @@ class SimpleCRUD {
     $this->rowCount = 0;
     $this->columnCount = 0;
     
+    $this->email = $email;
+    $this->password = $password;
+    
+    $this->workDocs = array ();
+    
     $this->categories = null;
     $this->lastUsedCatID = 1;
   }
@@ -103,18 +138,36 @@ class SimpleCRUD {
 
     if (true) {
       
+      foreach ( $this->workDocs as $k => $v ) {
+        //print ' | ' . $k . ' | ' . $v . "\n";
+        $curDoc =$v[URL]; 
+        //'https://spreadsheets.google.com/feeds/spreadsheets/tVyuiTsRNkpqTuXPE4OfrEw';
+        $sheet = $this->gdClient->getSpreadsheetEntry ( $curDoc );
+        $currKey = explode ( '/', $sheet->id->text );
+        //$this->currKey = $currKey [5];
+        $this->workDocs[$k][CURRKEY] =$currKey [5];
+        $this->currKey = $currKey [5]; 
+        //$res[$entry->title->text] = $entry->id->text; 
+        //$i ++;
+      }
+      
+    /*
       $curDoc = 'https://spreadsheets.google.com/feeds/spreadsheets/tVyuiTsRNkpqTuXPE4OfrEw';
       $sheet = $this->gdClient->getSpreadsheetEntry ( $curDoc );
       $currKey = explode ( '/', $sheet->id->text );
       $this->currKey = $currKey [5];
+      */
     } else {
       $feed = $this->gdClient->getSpreadsheetFeed ();
       print "== Available Spreadsheets ==\n";
       $this->printFeed ( $feed );
+      die ();
+      /*
       $input = getInput ( "\nSelection" );
       echo "\n[" . $feed->entries [$input]->id->text . "]";
       $currKey = explode ( '/', $feed->entries [$input]->id->text );
       $this->currKey = $currKey [5];
+      */
     }
   }
   
@@ -350,9 +403,9 @@ class SimpleCRUD {
           $hdrI = $datIndexByHdr [$hdr] - 1;
           $resultData [$curDat] [$hdr] = $cst [$hdrI]->getText ();
         }
-        $catRName =  $this->handleCategory ( $resultData [$curDat] );
+        $catRName = $this->handleCategory ( $resultData [$curDat] );
         // XXX ffdfr
-        $resultData [$curDat] [SM_CATEGORY_REFERENCE] = $catRName; 
+        $resultData [$curDat] [SM_CATEGORY_REFERENCE] = $catRName;
       }
       $i ++;
     }
@@ -554,9 +607,9 @@ class SimpleCRUD {
       if ($entry instanceof Zend_Gdata_Spreadsheets_CellEntry) {
         print $entry->title->text . ' ' . $entry->content->text . "\n";
       } else if ($entry instanceof Zend_Gdata_Spreadsheets_ListEntry) {
-        print $i . ' ' . $entry->title->text . ' | ' . $entry->content->text . "\n";
+        print $i . ' | ' . $entry->id->text . ' ' . $entry->title->text . ' | ' . $entry->content->text . "\n";
       } else {
-        print $i . ' ' . $entry->title->text . "\n";
+        print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
       }
       $i ++;
     }
@@ -675,7 +728,21 @@ class SimpleCRUD {
    * @return void
    */
   public function run() {
+    $docList = new GetAvailableDocuments ( $this->email, $this->password );
+    
+    $docs = $docList->getDocsArray ();
+    
+    $this->workDocs = $docs;
+    
     $this->promptForSpreadsheet ();
+    
+    foreach ( $this->workDocs as $k => $v ) {
+      print ' | ' . $k . ' | ' . $v . "\n";
+      //$res[$entry->title->text] = $entry->id->text; 
+    //$i ++;
+    }
+    die ();
+    
     $this->promptForWorksheet ();
     
     $res = null;
