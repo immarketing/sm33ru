@@ -1,0 +1,11 @@
+== Available Spreadsheets ==
+0 | https://spreadsheets.google.com/feeds/spreadsheets/tvRx5MP6xDWWmLHcIUeKDxQ | СВЧ печи
+1 | https://spreadsheets.google.com/feeds/spreadsheets/tTjf0naziCsAPbdaF__Pl6w | пылесосы
+2 | https://spreadsheets.google.com/feeds/spreadsheets/ttbQZXvTJXw-ZXDad6LKRgQ | Телефоны Стационарные
+3 | https://spreadsheets.google.com/feeds/spreadsheets/tOrpOn8En7JMPEjBHGOfy8g | Музыкальные центры
+4 | https://spreadsheets.google.com/feeds/spreadsheets/tt4YKQnSjlFr5BU5bmz53EA | Домашние кинотеатры
+5 | https://spreadsheets.google.com/feeds/spreadsheets/tSvTghmX9ls6pRcOfO_ohzQ | Фотоаппараты
+6 | https://spreadsheets.google.com/feeds/spreadsheets/tZ-8YsN5J3RGLvy-RxALj1A | DVD
+7 | https://spreadsheets.google.com/feeds/spreadsheets/tVyuiTsRNkpqTuXPE4OfrEw | Видеокамеры
+8 | https://spreadsheets.google.com/feeds/spreadsheets/tMFQmwWPCa-b7nPmxIg7Rzg | Телевизоры LED_ LCD
+9 | https://spreadsheets.google.com/feeds/spreadsheets/tJJqOourTWEq2wNKCII_Bew | AudioMagnitoly
