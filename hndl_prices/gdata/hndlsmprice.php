@@ -54,6 +54,15 @@ define ( "SM_CATEGORY_LEVEL_2", "sm.категория.2", true );
 define ( "SM_CATEGORY_LEVEL_3", "sm.категория.3", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 
+define ( "SM_INTERNAL_IDENTIFICATOR", "sm.internal.identificator", true );
+define ( "SM_INTERNAL_PRODUCTDESCRIPTION", "sm.product.description", true );
+define ( "SM_INTERNAL_PRODUCTSQLINSERTS", "sm.product.SQLinserts", true );
+/*
+define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
+define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
+define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
+*/
+
 class GetAvailableDocuments {
   public function __construct($email, $password) {
     //
@@ -75,8 +84,11 @@ class GetAvailableDocuments {
     //$i = 0;
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
-      $res [$entry->title->text] [URL] = $entry->id->text;
-      $res [$entry->title->text] [NAME] = $entry->title->text;
+      if ("Видеокамеры" === $entry->title->text || "Фотоаппараты" === $entry->title->text) {
+        //
+        $res [$entry->title->text] [URL] = $entry->id->text;
+        $res [$entry->title->text] [NAME] = $entry->title->text;
+      }
       //$i ++;
     }
     
@@ -140,15 +152,15 @@ class SimpleCRUD {
       
       foreach ( $this->workDocs as $k => $v ) {
         //print ' | ' . $k . ' | ' . $v . "\n";
-        $curDoc =$v[URL]; 
+        $curDoc = $v [URL];
         //'https://spreadsheets.google.com/feeds/spreadsheets/tVyuiTsRNkpqTuXPE4OfrEw';
         $sheet = $this->gdClient->getSpreadsheetEntry ( $curDoc );
         $currKey = explode ( '/', $sheet->id->text );
         //$this->currKey = $currKey [5];
-        $this->workDocs[$k][CURRKEY] =$currKey [5];
-        $this->currKey = $currKey [5]; 
+        $this->workDocs [$k] [CURRKEY] = $currKey [5];
+        $this->currKey = $currKey [5];
         //$res[$entry->title->text] = $entry->id->text; 
-        //$i ++;
+      //$i ++;
       }
       
     /*
@@ -176,23 +188,27 @@ class SimpleCRUD {
    *
    * @return void
    */
-  public function promptForWorksheet() {
+  public function promptForWorksheet($theKey) {
     if (true) {
       $query = new Zend_Gdata_Spreadsheets_DocumentQuery ();
-      $query->setSpreadsheetKey ( $this->currKey );
+      //$query->setSpreadsheetKey ( $this->currKey );
+      $query->setSpreadsheetKey ( $this->workDocs [$theKey] [CURRKEY] );
+      
       $feed = $this->gdClient->getWorksheetFeed ( $query );
       foreach ( $feed->entries as $entry ) {
         if (strtolower ( $entry->title->text ) === "options") {
-          echo "\nopt\n";
-          echo "\n[" . $entry->id->text . "]\n";
+          //echo "\nopt\n";
+          //echo "\n[" . $entry->id->text . "]\n";
           $currWkshtIdOpt = explode ( '/', $entry->id->text );
-          $this->currWkshtIdOpt = $currWkshtIdOpt [8];
+          //$this->currWkshtIdOpt = $currWkshtIdOpt [8];
+          $this->workDocs [$theKey] [CURWKSHTIDOPT] = $currWkshtIdOpt [8];
         }
         if (strtolower ( $entry->title->text ) === "data") {
-          echo "\ndata\n";
-          echo "\n[" . $entry->id->text . "]\n";
+          //echo "\ndata\n";
+          //echo "\n[" . $entry->id->text . "]\n";
           $currWkshtIdDat = explode ( '/', $entry->id->text );
-          $this->currWkshtIdDat = $currWkshtIdDat [8];
+          //$this->currWkshtIdDat = $currWkshtIdDat [8];
+          $this->workDocs [$theKey] [CURWKSHTIDDAT] = $currWkshtIdDat [8];
         }
       
       }
@@ -363,23 +379,93 @@ class SimpleCRUD {
     
     return $result;
   }
-  private function getOptionsHdrArrays() {
-    return $this->getHdrArrays ( $this->currKey, $this->currWkshtIdOpt );
+  private function getOptionsHdrArrays($theKey) {
+    //return $this->getHdrArrays ( $this->currKey, $this->currWkshtIdOpt );
+    return $this->getHdrArrays ( $this->workDocs [$theKey] [CURRKEY], $this->workDocs [$theKey] [CURWKSHTIDOPT] );
   }
   
-  private function getDataHdrArrays() {
-    return $this->getHdrArrays ( $this->currKey, $this->currWkshtIdDat );
+  private function getDataHdrArrays($theKey) {
+    //return $this->getHdrArrays ( $this->currKey, $this->currWkshtIdDat );
+    return $this->getHdrArrays ( $this->workDocs [$theKey] [CURRKEY], $this->workDocs [$theKey] [CURWKSHTIDDAT] );
+  
   }
   
-  public function hndlData() {
-    $datHeaders = $this->getDataHdrArrays ();
+  private function createProdSQLInsert(&$curProd) {
+    $pleerruID = $curProd ['Код'];
+    $curID = 2000000 + $pleerruID;
+    
+    $prodName = addslashes ( $curProd ['Наименование'] );
+    $prodSDesc = addslashes ( $curProd ['Описание'] );
+    
+    $fDesc = addslashes ( $curProd [SM_INTERNAL_PRODUCTDESCRIPTION] );
+    
+    $cName = $curProd [SM_CATEGORY_LEVEL_1] . "/" . $curProd [SM_CATEGORY_LEVEL_2] . "/" . $curProd [SM_CATEGORY_LEVEL_3];
+    
+    $catID =  $this->categories[$cName]["id"];
+    
+    return <<<EOT_EOT
+delete from `jos_vm_product` where `product_id` = '$curID';      
+insert `jos_vm_product` SET 
+`algo_metatag`='$prodName',
+`product_id` = '$curID',
+`vendor_id` = '2',
+`product_sku` = 'PLRRU$pleerruID',
+`product_name` = '$prodName',
+`product_desc` = '$fDesc',
+`product_s_desc` = '$prodSDesc',
+`product_thumb_image` = '',
+`product_full_image` = '',
+`product_publish` = 'Y',
+`product_weight` = '0',
+`product_weight_uom` = 'кг',
+`product_length` = '0',
+`product_width` = '0',
+`product_height` = '0',
+`product_lwh_uom` = '',
+`product_unit` = '',
+`product_packaging` = '0',
+`product_url` = '',
+`product_in_stock` = '43',
+`attribute` = '',
+`custom_attribute` = '',
+`product_available_date` = '-86400',
+`product_availability` = '',
+`product_special` = 'N',
+`child_options` = 'Y,N,N,N,N,Y,20%,10%,',
+`quantity_options` = 'none,0,0,1',
+`product_discount_id` = '1',
+`mdate` = '1258580519',
+`product_tax_id` = '0',
+`child_option_ids` = '',
+`product_order_levels` = '0,0'
+;
+delete from `jos_vm_product_category_xref` where `product_id` = '$curID';
+INSERT INTO `jos_vm_product_category_xref` VALUES($catID,$curID,  1);
+
+EOT_EOT;
+  
+  }
+  
+  private function createProdDescription(&$curProd) {
+    $result = '<table border="0" width="100%"> <tbody>';
+    foreach ( $curProd as $k => $v ) {
+      $result .= '
+  <tr><td>&nbsp;' . addslashes ( $k ) . '</td><td>&nbsp;' . addslashes ( $v ) . '</td></tr>
+        ';
+    }
+    $result .= '</tbody></table>';
+    return $result;
+  }
+  
+  public function hndlData($theKey) {
+    $datHeaders = $this->getDataHdrArrays ( $theKey );
     
     $datHdrByIndex = $datHeaders ["HdrByIndex"];
     $datIndexByHdr = $datHeaders ["IndexByHdr"];
     
     $query = new Zend_Gdata_Spreadsheets_ListQuery ();
-    $query->setSpreadsheetKey ( $this->currKey );
-    $query->setWorksheetId ( $this->currWkshtIdDat );
+    $query->setSpreadsheetKey ( $this->workDocs [$theKey] [CURRKEY] );
+    $query->setWorksheetId ( $this->workDocs [$theKey] [CURWKSHTIDDAT] );
     $this->listFeed = $this->gdClient->getListFeed ( $query );
     $i = 0;
     
@@ -406,8 +492,13 @@ class SimpleCRUD {
         $catRName = $this->handleCategory ( $resultData [$curDat] );
         // XXX ffdfr
         $resultData [$curDat] [SM_CATEGORY_REFERENCE] = $catRName;
+        $resultData [$curDat] [SM_INTERNAL_IDENTIFICATOR] = $curDat;
+        $resultData [$curDat] [SM_INTERNAL_PRODUCTDESCRIPTION] = $this->createProdDescription ( $resultData [$curDat] );
+        //$resultData [$curDat] [SM_INTERNAL_PRODUCTSQLINSERTS] = $this->createProdSQLInsert ( $resultData [$curDat] );
       }
       $i ++;
+      
+    //break;
     }
     
     $result ["data"] = $resultData;
@@ -471,15 +562,15 @@ class SimpleCRUD {
     return $this->categories [$cName] ["name"];
   }
   
-  public function hndlOptions() {
-    $optHeaders = $this->getOptionsHdrArrays ();
+  public function hndlOptions($theKey) {
+    $optHeaders = $this->getOptionsHdrArrays ( $theKey );
     
     $optHdrByIndex = $optHeaders ["HdrByIndex"];
     $optIndexByHdr = $optHeaders ["IndexByHdr"];
     
     $query = new Zend_Gdata_Spreadsheets_ListQuery ();
-    $query->setSpreadsheetKey ( $this->currKey );
-    $query->setWorksheetId ( $this->currWkshtIdOpt );
+    $query->setSpreadsheetKey ( $this->workDocs [$theKey] [CURRKEY] );
+    $query->setWorksheetId ( $this->workDocs [$theKey] [CURWKSHTIDOPT] );
     $this->listFeed = $this->gdClient->getListFeed ( $query );
     $i = 0;
     
@@ -669,8 +760,22 @@ class SimpleCRUD {
     $minID = 2000;
     foreach ( $this->categories as $k => $v ) {
       $this->categories [$k] ["id"] = $minID + $this->categories [$k] ["id"];
-      $this->categories [$k] ["parentid"] = $minID + $this->categories [$k] ["parentid"];
+      $this->categories [$k] ["parentid"] = ($this->categories [$k] ["parentid"] > 0 ? $minID + $this->categories [$k] ["parentid"] : 0);
     }
+  }
+  
+  private function createProductsSQLs() {
+    $res = "";
+    foreach ( $this->workDocs as $k => $v ) {
+      $data = $this->workDocs [$k] [DATA];
+      foreach ( $data as $dk => $dv ) {
+        // $resultData [$curDat] [SM_INTERNAL_PRODUCTSQLINSERTS] = $this->createProdSQLInsert ( $resultData [$curDat] );
+        $sql = $this->createProdSQLInsert ( $dv );
+        $dv[SM_INTERNAL_PRODUCTSQLINSERTS] = $sql;
+        $res.=$dv[SM_INTERNAL_PRODUCTSQLINSERTS];
+      }
+    }
+    return $res;
   }
   
   private function createCategoriesSQLs() {
@@ -681,23 +786,33 @@ class SimpleCRUD {
       $catName = $v ["selfname"];
       $parIndex = $v ["parentid"];
       $res .= "
+      delete from `jos_vm_category_xref` where `jos_vm_category_xref`.`category_parent_id`= $catIndex OR
+      `jos_vm_category_xref`.`category_child_id`= $catIndex;
+      DElete FROM `jos_vm_product_category_xref` where `jos_vm_product_category_xref`.category_id= $catIndex;
+      DElete FROM `jos_vm_category` where `jos_vm_category`.category_id = $catIndex;
+      ";
+    }
+    
+    foreach ( $this->categories as $k => $v ) {
+    $catIndex = $v ["id"];
+      $catName = $v ["selfname"];
+      $parIndex = $v ["parentid"];
+      $res .= "
       INSERT INTO `jos_vm_category` VALUES($catIndex, 2, '$catName', '', '', '', 'Y', 1259018351, 1259018351, 'managed', 4, 'flypage.tpl', 2);
-      
       INSERT INTO `jos_vm_category_xref`(`category_parent_id`,`category_child_id`,`category_list`) 
-      VALUES(10001, 
+      VALUES($parIndex, 
       $catIndex
       ,NULL);
-      
-      INSERT INTO `jos_vm_product_category_xref` VALUES($parIndex, $catIndex, 1);    
-          
     	";
       /*
+      INSERT INTO `jos_vm_product_category_xref` VALUES($parIndex, $catIndex, 1);    
       $this->categories[$k]["id"] = $minID + $this->categories[$k]["id"]; 
       $this->categories[$k]["parentid"] = $minID + $this->categories[$k]["parentid"];
       */
     }
     
-    return $res;
+    
+return $res;
     /*
     
           if (in_array ( $catName, $pleerruCategories )) {
@@ -714,12 +829,15 @@ class SimpleCRUD {
   
   private function createAndWriteSQLs() {
     $sqlFile = @fopen ( "cats.sql", "w" );
-    
     $catSQLs = $this->createCategoriesSQLs ();
     @fwrite ( $sqlFile, $catSQLs );
-    
+    $prodSQLs = $this->createProductsSQLs ();
+    @fwrite ( $sqlFile, $prodSQLs );
     @fclose ( $sqlFile );
-  
+    /*
+    $sqlFile = @fopen ( "prods.sql", "w" );
+    @fclose ( $sqlFile );
+    */
   }
   
   /**
@@ -737,32 +855,37 @@ class SimpleCRUD {
     $this->promptForSpreadsheet ();
     
     foreach ( $this->workDocs as $k => $v ) {
+      $this->promptForWorksheet ( $k );
+      $res = null;
+      $res = $this->hndlData ( $k );
+      $data = $res ["data"];
+      $this->workDocs [$k] [DATA] = $data;
+      
+      $res = null;
+      $res = $this->hndlOptions ( $k );
+      
+      $options = $res ["options"];
+      $this->workDocs [$k] [OPTIONS] = $options;
+    
+    }
+    
+    $this->recalcCategories ();
+    
+    foreach ( $this->workDocs as $k => $v ) {
       print ' | ' . $k . ' | ' . $v . "\n";
       //$res[$entry->title->text] = $entry->id->text; 
     //$i ++;
     }
+    
+    $this->createAndWriteSQLs ();
+    
     die ();
-    
-    $this->promptForWorksheet ();
-    
-    $res = null;
-    $res = $this->hndlData ();
-    $data = $res ["data"];
     
     /*
     foreach ( $this->categories as $en ) {
       echo '$en == ' . $en ["name"] . "\n";
     }
     */
-    
-    $this->recalcCategories ();
-    
-    $this->createAndWriteSQLs ();
-    
-    $res = null;
-    $res = $this->hndlOptions ();
-    
-    $options = $res ["options"];
     
     foreach ( $options as $entry ) {
       $optName = $entry ["Option"];
