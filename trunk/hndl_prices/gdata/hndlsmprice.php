@@ -57,6 +57,9 @@ define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 define ( "SM_INTERNAL_IDENTIFICATOR", "sm.internal.identificator", true );
 define ( "SM_INTERNAL_PRODUCTDESCRIPTION", "sm.product.description", true );
 define ( "SM_INTERNAL_PRODUCTSQLINSERTS", "sm.product.SQLinserts", true );
+
+define ( "SM_INTERNAL_FULLPICTURL", "sm.product.fullpicturl", true );
+
 /*
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
@@ -84,7 +87,16 @@ class GetAvailableDocuments {
     //$i = 0;
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
-      if ("Видеокамеры" === $entry->title->text || "Фотоаппараты" === $entry->title->text) {
+      if (  "Видеокамеры" === $entry->title->text || 
+      		"Фотоаппараты" === $entry->title->text ||
+            "Домашние кинотеатры"=== $entry->title->text ||
+            "Музыкальные центры"=== $entry->title->text ||
+            "Телевизоры LED_ LCD"=== $entry->title->text ||
+            "DVD"=== $entry->title->text ||
+            "пылесосы"=== $entry->title->text ||
+      
+            false
+      ) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
         $res [$entry->title->text] [NAME] = $entry->title->text;
@@ -397,11 +409,13 @@ class SimpleCRUD {
     $prodName = addslashes ( $curProd ['Наименование'] );
     $prodSDesc = addslashes ( $curProd ['Описание'] );
     
+    $fullPURL = addslashes ( $curProd [SM_INTERNAL_FULLPICTURL] );
+    
     $fDesc = addslashes ( $curProd [SM_INTERNAL_PRODUCTDESCRIPTION] );
     
     $cName = $curProd [SM_CATEGORY_LEVEL_1] . "/" . $curProd [SM_CATEGORY_LEVEL_2] . "/" . $curProd [SM_CATEGORY_LEVEL_3];
     
-    $catID =  $this->categories[$cName]["id"];
+    $catID = $this->categories [$cName] ["id"];
     
     return <<<EOT_EOT
 delete from `jos_vm_product` where `product_id` = '$curID';      
@@ -413,8 +427,8 @@ insert `jos_vm_product` SET
 `product_name` = '$prodName',
 `product_desc` = '$fDesc',
 `product_s_desc` = '$prodSDesc',
-`product_thumb_image` = '',
-`product_full_image` = '',
+`product_thumb_image` = '$fullPURL',
+`product_full_image` = '$fullPURL',
 `product_publish` = 'Y',
 `product_weight` = '0',
 `product_weight_uom` = 'кг',
@@ -446,13 +460,36 @@ EOT_EOT;
   
   }
   
-  private function createProdDescription(&$curProd) {
-    $result = '<table border="0" width="100%"> <tbody>';
+  private function createProdDescription(&$curProd, &$theKey) {
+    $result = '<table border="1" width="100%"> <tbody>';
+    
+    $opts = $this->workDocs [$theKey] [OPTIONS];
+    $optGrps = $this->workDocs [$theKey] [OPTIONSGROUP];
+    $ordGrp = array ();
+    foreach ( $optGrps as $k => $v ) {
+      $ordGrp [$v [GROUPORDER]] = $v;
+    }
+    
+    foreach ( $ordGrp as $k => $v ) {
+      //echo $k . $v;
+      $result .= '<tr><td colspan="2" rowspan="1">' . $v [GROUPNAME] . '&nbsp;&nbsp;</td></tr> ';
+      foreach ( $v [OPTIONS] as $ko => $vo ) {
+        if ($curProd [$vo] !== "") {
+          $result .= '
+  <tr><td>&nbsp;' . addslashes ( $vo ) . '</td><td>&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
+        ';
+        
+        }
+      }
+    }
+    
+    /*
     foreach ( $curProd as $k => $v ) {
       $result .= '
   <tr><td>&nbsp;' . addslashes ( $k ) . '</td><td>&nbsp;' . addslashes ( $v ) . '</td></tr>
         ';
     }
+        */
     $result .= '</tbody></table>';
     return $result;
   }
@@ -493,8 +530,11 @@ EOT_EOT;
         // XXX ffdfr
         $resultData [$curDat] [SM_CATEGORY_REFERENCE] = $catRName;
         $resultData [$curDat] [SM_INTERNAL_IDENTIFICATOR] = $curDat;
-        $resultData [$curDat] [SM_INTERNAL_PRODUCTDESCRIPTION] = $this->createProdDescription ( $resultData [$curDat] );
-        //$resultData [$curDat] [SM_INTERNAL_PRODUCTSQLINSERTS] = $this->createProdSQLInsert ( $resultData [$curDat] );
+        $resultData [$curDat] [SM_INTERNAL_PRODUCTDESCRIPTION] = $this->createProdDescription ( $resultData [$curDat], $theKey );
+        //Ссылка на картинку
+        $resultData [$curDat] [SM_INTERNAL_FULLPICTURL] = $resultData [$curDat] ['Ссылка на картинку'];
+        
+      //$resultData [$curDat] [SM_INTERNAL_PRODUCTSQLINSERTS] = $this->createProdSQLInsert ( $resultData [$curDat] );
       }
       $i ++;
       
@@ -577,6 +617,7 @@ EOT_EOT;
     $feed = $this->listFeed;
     
     $resultOptions = null;
+    $resultOptGrp = array ();
     
     foreach ( $feed->entries as $entry ) {
       if ($entry instanceof Zend_Gdata_Spreadsheets_ListEntry) {
@@ -593,12 +634,19 @@ EOT_EOT;
         $resultOptions [$curOpt] ["Group"] = $cst [$optIndexByHdr ["Group"] - 1]->getText ();
         $resultOptions [$curOpt] ["GroupOrder"] = $cst [$optIndexByHdr ["GroupOrder"] - 1]->getText ();
         $resultOptions [$curOpt] ["IsMain"] = $cst [$optIndexByHdr ["IsMain"] - 1]->getText ();
-      
+        
+        $theGroup = $resultOptions [$curOpt] ["Group"];
+        $resultOptGrp [$theGroup] [GROUPNAME] = $theGroup;
+        if ($resultOptGrp [$theGroup] [GROUPORDER] == null) {
+          $resultOptGrp [$theGroup] [GROUPORDER] = $resultOptions [$curOpt] ["GroupOrder"];
+        }
+        $resultOptGrp [$theGroup] [OPTIONS] [] = $curOpt;
       }
       $i ++;
     }
     
     $result ["options"] = $resultOptions;
+    $result ["optionsgroup"] = $resultOptGrp;
     
     return $result;
   
@@ -771,8 +819,8 @@ EOT_EOT;
       foreach ( $data as $dk => $dv ) {
         // $resultData [$curDat] [SM_INTERNAL_PRODUCTSQLINSERTS] = $this->createProdSQLInsert ( $resultData [$curDat] );
         $sql = $this->createProdSQLInsert ( $dv );
-        $dv[SM_INTERNAL_PRODUCTSQLINSERTS] = $sql;
-        $res.=$dv[SM_INTERNAL_PRODUCTSQLINSERTS];
+        $dv [SM_INTERNAL_PRODUCTSQLINSERTS] = $sql;
+        $res .= $dv [SM_INTERNAL_PRODUCTSQLINSERTS];
       }
     }
     return $res;
@@ -794,11 +842,11 @@ EOT_EOT;
     }
     
     foreach ( $this->categories as $k => $v ) {
-    $catIndex = $v ["id"];
+      $catIndex = $v ["id"];
       $catName = $v ["selfname"];
       $parIndex = $v ["parentid"];
       $res .= "
-      INSERT INTO `jos_vm_category` VALUES($catIndex, 2, '$catName', '', '', '', 'Y', 1259018351, 1259018351, 'managed', 4, 'flypage.tpl', 2);
+      INSERT INTO `jos_vm_category` VALUES($catIndex, 2, '$catName', '', '', '', 'Y', 1259018351, 1259018351, 'browse_4', 4, 'flypage.tpl', 2);
       INSERT INTO `jos_vm_category_xref`(`category_parent_id`,`category_child_id`,`category_list`) 
       VALUES($parIndex, 
       $catIndex
@@ -811,8 +859,7 @@ EOT_EOT;
       */
     }
     
-    
-return $res;
+    return $res;
     /*
     
           if (in_array ( $catName, $pleerruCategories )) {
@@ -856,30 +903,31 @@ return $res;
     
     foreach ( $this->workDocs as $k => $v ) {
       $this->promptForWorksheet ( $k );
-      $res = null;
-      $res = $this->hndlData ( $k );
-      $data = $res ["data"];
-      $this->workDocs [$k] [DATA] = $data;
       
       $res = null;
       $res = $this->hndlOptions ( $k );
       
-      $options = $res ["options"];
-      $this->workDocs [$k] [OPTIONS] = $options;
+      $this->workDocs [$k] [OPTIONS] = $res ["options"];
+      $this->workDocs [$k] [OPTIONSGROUP] = $res ["optionsgroup"];
+      
+      $res = null;
+      $res = $this->hndlData ( $k );
+      $data = $res ["data"];
+      $this->workDocs [$k] [DATA] = $data;
     
     }
     
     $this->recalcCategories ();
     
     foreach ( $this->workDocs as $k => $v ) {
-      print ' | ' . $k . ' | ' . $v . "\n";
-      //$res[$entry->title->text] = $entry->id->text; 
+      //print ' | ' . $k . ' | ' . $v . "\n";
+    //$res[$entry->title->text] = $entry->id->text; 
     //$i ++;
     }
     
     $this->createAndWriteSQLs ();
     
-    die ();
+    die ("All done\n");
     
     /*
     foreach ( $this->categories as $en ) {
