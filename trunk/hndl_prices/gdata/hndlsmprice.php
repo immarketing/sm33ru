@@ -60,6 +60,7 @@ define ( "SM_INTERNAL_PRODUCTSQLINSERTS", "sm.product.SQLinserts", true );
 
 define ( "SM_INTERNAL_FULLPICTURL", "sm.product.fullpicturl", true );
 
+define ( "SM_INTERNAL_PRICE", "sm.цена", true );
 /*
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
@@ -417,7 +418,10 @@ class SimpleCRUD {
     
     $catID = $this->categories [$cName] ["id"];
     
+    $prc  = $curProd[SM_INTERNAL_PRICE];
     return <<<EOT_EOT
+delete from `jos_vm_product_price` where  product_id = '$curID';
+
 delete from `jos_vm_product` where `product_id` = '$curID';      
 insert `jos_vm_product` SET 
 `algo_metatag`='$prodName',
@@ -455,6 +459,20 @@ insert `jos_vm_product` SET
 ;
 delete from `jos_vm_product_category_xref` where `product_id` = '$curID';
 INSERT INTO `jos_vm_product_category_xref` VALUES($catID,$curID,  1);
+
+INSERT INTO `jos_vm_product_price` (product_price_id, product_id, product_price, product_currency,product_price_vdate,
+product_price_edate,
+cdate,
+mdate,
+shopper_group_id,
+price_quantity_start,
+price_quantity_end)
+ VALUES(
+ $curID , 
+ $curID , 
+ '$prc', 
+ 'RUB', 0, 0, 1258666157, 1259017978, 5, 0, 0)
+ ; 
 
 EOT_EOT;
   
