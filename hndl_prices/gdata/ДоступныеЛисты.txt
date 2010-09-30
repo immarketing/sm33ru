@@ -9,3 +9,13 @@
 7 | https://spreadsheets.google.com/feeds/spreadsheets/tVyuiTsRNkpqTuXPE4OfrEw | Видеокамеры
 8 | https://spreadsheets.google.com/feeds/spreadsheets/tMFQmwWPCa-b7nPmxIg7Rzg | Телевизоры LED_ LCD
 9 | https://spreadsheets.google.com/feeds/spreadsheets/tJJqOourTWEq2wNKCII_Bew | AudioMagnitoly
+
+
+<img border="0" alt="BBK DV 118SI silver" title="BBK DV 118SI silver" class="browseProductImage" 00="" 
+src="
+http://localhost/ce2/components/com_virtuemart/show_image_in_imgtag.php?filename=2992025.jpg&amp;newxsize=100&amp;newysize=160&amp;fileout=
+">
+
+_100x160
+
+resized/2992562_100x160.jpg

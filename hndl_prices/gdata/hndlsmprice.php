@@ -19,6 +19,7 @@
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
+include ('class.img2thumb.php');
 /**
  * @see Zend_Loader
  */
@@ -67,6 +68,104 @@ define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 */
 
+class ImageLoader {
+  public function __construct($prodID, $infoURL, $dirName) {
+    $this->prodID = $prodID;
+    $this->infoURL = $infoURL;
+    $this->dirName = $dirName;
+  
+  }
+  
+  private function readInfoFromURL($prodID, $infoURL, $fileName, $fn2, $fnPNG) {
+    $fpout = @fopen ( $fileName, "w" );
+    if ($fpout) {
+      $ch = curl_init ();
+      curl_setopt ( $ch, CURLOPT_URL, $infoURL );
+      //curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      //curl_setopt ( $ch, CURLOPT_PROXY, 'prx01-kaz.kaz.transneft.ru:8080' );
+      //curl_setopt ( $ch, CURLOPT_PROXYAUTH, CURLAUTH_NTLM );
+      //curl_setopt ( $ch, CURLOPT_PROXYUSERPWD, 'galaxy7:123qwe!!' );
+      //curl_setopt($ch, CURLOPT_VERBOSE, true);
+      
+
+      curl_setopt ( $ch, CURLOPT_FILE, $fpout );
+      curl_setopt ( $ch, CURLOPT_HEADER, 0 );
+      
+      curl_exec ( $ch );
+      fclose ( $fpout );
+    }
+    
+    $resI = imagecreatefromjpeg ( $fileName );
+    if (! $resI) {
+      $resI = imagecreatefrompng ( $fileName );
+      if ($resI) {
+        //imagejpeg ( $resI, $fn2 );
+        imagedestroy ( $resI );
+        copy ( $fileName, $fnPNG );
+        return "PNG";
+      } else {
+        return false;
+      }
+    } else {
+      copy ( $fileName, $fn2 );
+      imagedestroy ( $resI );
+      return "JPG";
+    }
+    
+    return true;
+    
+  /*
+    */
+  }
+  public function tryLoadImage() {
+    //global $options;
+    $fileName = './images/' . $this->prodID . '.jpg';
+    
+    $fN2 = './product/' . $this->prodID . '.jpg';
+    $fNp = './product/' . $this->prodID . '.png';
+    
+    $fpout = @fopen ( $fN2, "r" );
+    if ($fpout) {
+      @fclose ( $fpout );
+      $neu = new Img2Thumb ( $fN2, 100, 160, './product/resized/' . $this->prodID . '_100x160.jpg' );
+      return "JPG";
+    }
+    
+    $fpout = @fopen ( $fNp, "r" );
+    if ($fpout) {
+      @fclose ( $fpout );
+      $neu = new Img2Thumb ( $fNp, 100, 160, './product/resized/' . $this->prodID . '_100x160.png' );
+      return "PNG";
+    }
+    
+    $fpout = @fopen ( $fileName, "r" );
+    $res = false;
+    if (! $fpout) {
+      $res = $this->readInfoFromURL ( $this->prodID, $this->infoURL, $fileName, $fN2, $fNp );
+      $fpout = @fopen ( $fileName, "r" );
+      $fpout = @fopen ( $fN2, "r" );
+      if ($fpout) {
+        @fclose ( $fpout );
+        $neu = new Img2Thumb ( $fN2, 100, 160, './product/resized/' . $this->prodID . '_100x160.jpg' );
+        return "JPG";
+      }
+      
+      $fpout = @fopen ( $fNp, "r" );
+      if ($fpout) {
+        @fclose ( $fpout );
+        $neu = new Img2Thumb ( $fNp, 100, 160, './product/resized/' . $this->prodID . '_100x160.png' );
+        return "PNG";
+      }
+    }
+    if ($fpout) {
+      @fclose ( $fpout );
+    }
+    
+    return $res;
+  }
+
+}
+
 class GetAvailableDocuments {
   public function __construct($email, $password) {
     //
@@ -88,16 +187,13 @@ class GetAvailableDocuments {
     //$i = 0;
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
-      if (  "Видеокамеры" === $entry->title->text || 
-      		"Фотоаппараты" === $entry->title->text ||
-            "Домашние кинотеатры"=== $entry->title->text ||
-            "Музыкальные центры"=== $entry->title->text ||
-            "Телевизоры LED_ LCD"=== $entry->title->text ||
-            "DVD"=== $entry->title->text ||
-            "пылесосы"=== $entry->title->text ||
+      if ("Видеокамеры" === $entry->title->text || //
+
+
+      "Фотоаппараты" === $entry->title->text || "Домашние кинотеатры" === $entry->title->text || "Музыкальные центры" === $entry->title->text || "Телевизоры LED_ LCD" === $entry->title->text || "DVD" === $entry->title->text || "пылесосы" === $entry->title->text || 
       
-            false
-      ) {
+
+      false) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
         $res [$entry->title->text] [NAME] = $entry->title->text;
@@ -411,6 +507,7 @@ class SimpleCRUD {
     $prodSDesc = addslashes ( $curProd ['Описание'] );
     
     $fullPURL = addslashes ( $curProd [SM_INTERNAL_FULLPICTURL] );
+    $smallPURL = addslashes ( $curProd [SM_INTERNAL_SMALLPICTURL] );
     
     $fDesc = addslashes ( $curProd [SM_INTERNAL_PRODUCTDESCRIPTION] );
     
@@ -418,7 +515,7 @@ class SimpleCRUD {
     
     $catID = $this->categories [$cName] ["id"];
     
-    $prc  = $curProd[SM_INTERNAL_PRICE];
+    $prc = $curProd [SM_INTERNAL_PRICE];
     return <<<EOT_EOT
 delete from `jos_vm_product_price` where  product_id = '$curID';
 
@@ -431,7 +528,7 @@ insert `jos_vm_product` SET
 `product_name` = '$prodName',
 `product_desc` = '$fDesc',
 `product_s_desc` = '$prodSDesc',
-`product_thumb_image` = '$fullPURL',
+`product_thumb_image` = '$smallPURL',
 `product_full_image` = '$fullPURL',
 `product_publish` = 'Y',
 `product_weight` = '0',
@@ -488,13 +585,15 @@ EOT_EOT;
       $ordGrp [$v [GROUPORDER]] = $v;
     }
     
+    sort ( $ordGrp, SORT_NUMERIC );
+    
     foreach ( $ordGrp as $k => $v ) {
       //echo $k . $v;
-      $result .= '<tr><td colspan="2" rowspan="1">' . $v [GROUPNAME] . '&nbsp;&nbsp;</td></tr> ';
+      $result .= '<tr style="background-color: dodgerblue;"><td colspan="2" rowspan="1"><span>' . $v [GROUPNAME] . '</span>&nbsp;&nbsp;</td></tr> ';
       foreach ( $v [OPTIONS] as $ko => $vo ) {
         if ($curProd [$vo] !== "") {
           $result .= '
-  <tr><td>&nbsp;' . addslashes ( $vo ) . '</td><td>&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
+  <tr><td style="background-color: darkturquoise;">&nbsp;&nbsp;&nbsp;' . addslashes ( $vo ) . '</td><td>&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
         ';
         
         }
@@ -830,6 +929,37 @@ EOT_EOT;
     }
   }
   
+  private function loadPImagesFromWeb() {
+    $res = "";
+    foreach ( $this->workDocs as $k => $v ) {
+      $data = $this->workDocs [$k] [DATA];
+      foreach ( $data as $dk => $dv ) {
+        // $resultData [$curDat] [SM_INTERNAL_PRODUCTSQLINSERTS] = $this->createProdSQLInsert ( $resultData [$curDat] );
+        ;
+        $curID = 2000000 + $dv ['Код'];
+        
+        $imldr = new ImageLoader ( $curID, $dv [SM_INTERNAL_FULLPICTURL], '' );
+        $imgLoaded = $imldr->tryLoadImage ();
+        if ($imgLoaded) {
+          if ($imgLoaded == "JPG") {
+            $this->workDocs [$k] [DATA] [$dk] [SM_INTERNAL_FULLPICTURL] = '' . $curID . '.jpg';
+            $this->workDocs [$k] [DATA] [$dk] [SM_INTERNAL_SMALLPICTURL] = 'resized/' . $curID . '_100x160.jpg';
+          } else if ($imgLoaded == "PNG") {
+            $this->workDocs [$k] [DATA] [$dk] [SM_INTERNAL_FULLPICTURL] = '' . $curID . '.png';
+            $this->workDocs [$k] [DATA] [$dk] [SM_INTERNAL_SMALLPICTURL] = 'resized/' . $curID . '_100x160.png';
+          } else {
+            $this->workDocs [$k] [DATA] [$dk] [SM_INTERNAL_FULLPICTURL] = '';
+            $this->workDocs [$k] [DATA] [$dk] [SM_INTERNAL_SMALLPICTURL] = '';
+          }
+        } else {
+          $this->workDocs [$k] [DATA] [$dk] [SM_INTERNAL_FULLPICTURL] = '';
+          $this->workDocs [$k] [DATA] [$dk] [SM_INTERNAL_SMALLPICTURL] = '';
+        }
+      }
+    }
+    return $res;
+  }
+  
   private function createProductsSQLs() {
     $res = "";
     foreach ( $this->workDocs as $k => $v ) {
@@ -864,7 +994,7 @@ EOT_EOT;
       $catName = $v ["selfname"];
       $parIndex = $v ["parentid"];
       $res .= "
-      INSERT INTO `jos_vm_category` VALUES($catIndex, 2, '$catName', '', '', '', 'Y', 1259018351, 1259018351, 'browse_4', 4, 'flypage.tpl', 2);
+      INSERT INTO `jos_vm_category` VALUES($catIndex, 2, '$catName', '', '', '', 'Y', 1259018351, 1259018351, 'browse_4', 3, 'flypage.tpl', 2);
       INSERT INTO `jos_vm_category_xref`(`category_parent_id`,`category_child_id`,`category_list`) 
       VALUES($parIndex, 
       $catIndex
@@ -920,6 +1050,7 @@ EOT_EOT;
     $this->promptForSpreadsheet ();
     
     foreach ( $this->workDocs as $k => $v ) {
+      echo "Handling \t $k                                        \r";
       $this->promptForWorksheet ( $k );
       
       $res = null;
@@ -943,9 +1074,11 @@ EOT_EOT;
     //$i ++;
     }
     
-    $this->createAndWriteSQLs ();
+    //print ' | loadPImagesFromWeb' . "\n";
+    $this->loadPImagesFromWeb ();
     
-    die ("All done\n");
+    $this->createAndWriteSQLs ();
+    die ( "\nAll done                   \n" );
     
     /*
     foreach ( $this->categories as $en ) {
