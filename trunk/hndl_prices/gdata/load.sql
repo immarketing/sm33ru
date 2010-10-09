@@ -11,6 +11,9 @@ delete from jos_vm_product_category_xref ;
 delete from jos_vm_category ;
 delete from jos_vm_product ;
 delete from jos_vm_product_price ;
+quit
+
+mysql --default-character-set=Utf8 -u suupermarkt -pMarKt3687Jhhdj suupermarkt <cats.sql
 
 LOAD DATA INFILE 'jos_vm_category_xref.sql' INTO TABLE jos_vm_category_xref;
 
@@ -19,4 +22,5 @@ LOAD DATA INFILE 'jos_vm_category_xref.sql' INTO TABLE jos_vm_category_xref;
 select product_id,product_thumb_image, product_full_image from jos_vm_product;
 update jos_vm_product set product_thumb_image=concat(product_id,'.jpg'), product_full_image=concat(product_id,'.jpg');
 
-mysql --default-character-set=Utf8 -u suupermarkt -pMarKt3687Jhhdj suupermarkt <cats.sql
+update jos_vm_product set product_thumb_image=product_full_image;
+
