@@ -507,13 +507,23 @@ class SimpleCRUD {
     $prodSDesc = addslashes ( $curProd ['Описание'] );
     
     $fullPURL = addslashes ( $curProd [SM_INTERNAL_FULLPICTURL] );
-    $smallPURL = addslashes ( $curProd [SM_INTERNAL_SMALLPICTURL] );
+    // $smallPURL = addslashes ( $curProd [SM_INTERNAL_SMALLPICTURL] );
+    $smallPURL = $fullPURL ;
     
     $fDesc = addslashes ( $curProd [SM_INTERNAL_PRODUCTDESCRIPTION] );
     
     $cName = $curProd [SM_CATEGORY_LEVEL_1] . "/" . $curProd [SM_CATEGORY_LEVEL_2] . "/" . $curProd [SM_CATEGORY_LEVEL_3];
-    
     $catID = $this->categories [$cName] ["id"];
+    
+    $cName2 = $curProd [SM_CATEGORY_LEVEL_1] . "/" . $curProd [SM_CATEGORY_LEVEL_2] . "/" ;
+    $catID2 = $this->categories [$cName2] ["id"];
+    
+    $addr = '';
+    if ($catID2 != $catID) {
+      $addr = "
+INSERT INTO `jos_vm_product_category_xref` VALUES($catID2,$curID,  1);
+      ";
+    }
     
     $prc = $curProd [SM_INTERNAL_PRICE];
     return <<<EOT_EOT
@@ -557,6 +567,8 @@ insert `jos_vm_product` SET
 delete from `jos_vm_product_category_xref` where `product_id` = '$curID';
 INSERT INTO `jos_vm_product_category_xref` VALUES($catID,$curID,  1);
 
+$addr
+
 INSERT INTO `jos_vm_product_price` (product_price_id, product_id, product_price, product_currency,product_price_vdate,
 product_price_edate,
 cdate,
@@ -589,11 +601,17 @@ EOT_EOT;
     
     foreach ( $ordGrp as $k => $v ) {
       //echo $k . $v;
-      $result .= '<tr style="background-color: dodgerblue;"><td colspan="2" rowspan="1"><span>' . $v [GROUPNAME] . '</span>&nbsp;&nbsp;</td></tr> ';
+      
+      // background-color: aquamarine;
+      // background-color: powderblue;
+      
+      $result .= '<tr style="background-color: dodgerblue;"><td colspan="2" rowspan="1"><span style="font-weight: bold;">' . $v [GROUPNAME] . '</span>&nbsp;&nbsp;</td></tr> ';
+      $cnt = 1;
       foreach ( $v [OPTIONS] as $ko => $vo ) {
+        
         if ($curProd [$vo] !== "") {
           $result .= '
-  <tr><td style="background-color: darkturquoise;">&nbsp;&nbsp;&nbsp;' . addslashes ( $vo ) . '</td><td>&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
+  <tr style="'.(($cnt++) % 2? 'background-color: aquamarine;':'background-color: powderblue;' ).'"><td>&nbsp;&nbsp;&nbsp;' . addslashes ( $vo ) . '</td><td>&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
         ';
         
         }
@@ -1050,7 +1068,7 @@ EOT_EOT;
     $this->promptForSpreadsheet ();
     
     foreach ( $this->workDocs as $k => $v ) {
-      echo "Handling \t $k                                        \r";
+      echo "Handling \t $k           \r";
       $this->promptForWorksheet ( $k );
       
       $res = null;
