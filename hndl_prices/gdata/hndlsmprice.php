@@ -53,6 +53,7 @@ Zend_Loader::loadClass ( 'Zend_Http_Client' );
 define ( "SM_CATEGORY_LEVEL_1", "sm.категория.1", true );
 define ( "SM_CATEGORY_LEVEL_2", "sm.категория.2", true );
 define ( "SM_CATEGORY_LEVEL_3", "sm.категория.3", true );
+define ( "SM_IS_PUBLISHED", "sm.публиковать", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 
 define ( "SM_INTERNAL_IDENTIFICATOR", "sm.internal.identificator", true );
@@ -187,7 +188,13 @@ class GetAvailableDocuments {
     //$i = 0;
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
-      if ("Видеокамеры" === $entry->title->text || //
+      if ("СВЧ печи" === $entry->title->text || //
+
+
+      "Видеокамеры" === $entry->title->text || //
+      
+
+      "Кофеварки" === $entry->title->text || //
 
 
       "Фотоаппараты" === $entry->title->text || "Домашние кинотеатры" === $entry->title->text || "Музыкальные центры" === $entry->title->text || "Телевизоры LED_ LCD" === $entry->title->text || "DVD" === $entry->title->text || "пылесосы" === $entry->title->text || 
@@ -247,6 +254,12 @@ class SimpleCRUD {
     $this->lastUsedCatID = 1;
   }
   
+  private function listSpreadsheets() {
+    $feed = $this->gdClient->getSpreadsheetFeed ();
+    print "== Available Spreadsheets ==\n";
+    $this->printFeed ( $feed );
+    die ();
+  }
   /**
    * promptForSpreadsheet
    *
@@ -279,10 +292,6 @@ class SimpleCRUD {
       $this->currKey = $currKey [5];
       */
     } else {
-      $feed = $this->gdClient->getSpreadsheetFeed ();
-      print "== Available Spreadsheets ==\n";
-      $this->printFeed ( $feed );
-      die ();
       /*
       $input = getInput ( "\nSelection" );
       echo "\n[" . $feed->entries [$input]->id->text . "]";
@@ -508,14 +517,14 @@ class SimpleCRUD {
     
     $fullPURL = addslashes ( $curProd [SM_INTERNAL_FULLPICTURL] );
     // $smallPURL = addslashes ( $curProd [SM_INTERNAL_SMALLPICTURL] );
-    $smallPURL = $fullPURL ;
+    $smallPURL = $fullPURL;
     
     $fDesc = addslashes ( $curProd [SM_INTERNAL_PRODUCTDESCRIPTION] );
     
     $cName = $curProd [SM_CATEGORY_LEVEL_1] . "/" . $curProd [SM_CATEGORY_LEVEL_2] . "/" . $curProd [SM_CATEGORY_LEVEL_3];
     $catID = $this->categories [$cName] ["id"];
     
-    $cName2 = $curProd [SM_CATEGORY_LEVEL_1] . "/" . $curProd [SM_CATEGORY_LEVEL_2] . "/" ;
+    $cName2 = $curProd [SM_CATEGORY_LEVEL_1] . "/" . $curProd [SM_CATEGORY_LEVEL_2] . "/";
     $catID2 = $this->categories [$cName2] ["id"];
     
     $addr = '';
@@ -524,6 +533,8 @@ class SimpleCRUD {
 INSERT INTO `jos_vm_product_category_xref` VALUES($catID2,$curID,  1);
       ";
     }
+    
+    $artcl = "ELC$curID";
     
     $prc = $curProd [SM_INTERNAL_PRICE];
     return <<<EOT_EOT
@@ -534,7 +545,7 @@ insert `jos_vm_product` SET
 `algo_metatag`='$prodName',
 `product_id` = '$curID',
 `vendor_id` = '2',
-`product_sku` = 'PLRRU$pleerruID',
+`product_sku` = '$artcl',
 `product_name` = '$prodName',
 `product_desc` = '$fDesc',
 `product_s_desc` = '$prodSDesc',
@@ -602,16 +613,18 @@ EOT_EOT;
     foreach ( $ordGrp as $k => $v ) {
       //echo $k . $v;
       
+
       // background-color: aquamarine;
       // background-color: powderblue;
       
+
       $result .= '<tr style="background-color: dodgerblue;"><td colspan="2" rowspan="1"><span style="font-weight: bold;">' . $v [GROUPNAME] . '</span>&nbsp;&nbsp;</td></tr> ';
       $cnt = 1;
       foreach ( $v [OPTIONS] as $ko => $vo ) {
         
         if ($curProd [$vo] !== "") {
           $result .= '
-  <tr style="'.(($cnt++) % 2? 'background-color: aquamarine;':'background-color: powderblue;' ).'"><td>&nbsp;&nbsp;&nbsp;' . addslashes ( $vo ) . '</td><td>&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
+  <tr style="' . (($cnt ++) % 2 ? 'background-color: aquamarine;' : 'background-color: powderblue;') . '"><td>&nbsp;&nbsp;&nbsp;' . addslashes ( $vo ) . '</td><td>&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
         ';
         
         }
@@ -651,7 +664,21 @@ EOT_EOT;
         $cst = $entry->getCustom ();
         //print $i . ' pp ==  ' . $cst [$optIndexByHdr ["ПроБа пера"] - 1]->getText() . "\n";
         $curDat = $cst [$datIndexByHdr ["Код"] - 1]->getText ();
-        if ($curDat === "" || $curDat === null) {
+        $curMrkYaRu = $cst [$datIndexByHdr ["market.yandex.ru"] - 1]->getText ();
+        $curIsPblshd = $cst [$datIndexByHdr [SM_IS_PUBLISHED] - 1]->getText ();
+        
+        if (!$curIsPblshd){
+          continue;
+        }
+        
+        if ($curIsPblshd == 0) {
+          continue;
+        }
+        
+        if ($curDat != "991845") {
+          //continue;
+        }
+        if ($curDat === "" || $curDat === null || $curMrkYaRu === "" || $curMrkYaRu === null) {
           continue;
         }
         $resultData [$curDat] = null;
@@ -659,10 +686,23 @@ EOT_EOT;
         //foreach ( $datIndexByHdr as $hdr ) {
         foreach ( $datHdrByIndex as $hdr ) {
           $hdrI = $datIndexByHdr [$hdr] - 1;
-          $resultData [$curDat] [$hdr] = $cst [$hdrI]->getText ();
+          try {
+            if ($cst [$hdrI]) {
+              $resultData [$curDat] [$hdr] = $cst [$hdrI]->getText ();
+              /*
+              if ($cst [$hdrI]->getText) {
+              
+              }
+              */
+            }
+          } catch ( Exception $e ) {
+            //continue;
+          }
         }
         $catRName = $this->handleCategory ( $resultData [$curDat] );
         // XXX ffdfr
+        $id = 2000000 + $curDat;
+        $resultData [$curDat] ['Артикул'] = "ELC$id";
         $resultData [$curDat] [SM_CATEGORY_REFERENCE] = $catRName;
         $resultData [$curDat] [SM_INTERNAL_IDENTIFICATOR] = $curDat;
         $resultData [$curDat] [SM_INTERNAL_PRODUCTDESCRIPTION] = $this->createProdDescription ( $resultData [$curDat], $theKey );
@@ -1053,6 +1093,9 @@ EOT_EOT;
     */
   }
   
+  public function runListDocs() {
+    $this->listSpreadsheets();
+  }
   /**
    * run
    *
@@ -1127,22 +1170,43 @@ function getInput($text) {
 $email = "sm33.bot@gmail.com";
 $pass = "Rty6$52hgsgt";
 
-/*
-// process command line options
+//$argv[]='--updatemartins=..\martins\martins.xls';
+//$argv[]='--makesql';
+
+
 foreach ( $argv as $argument ) {
-	$argParts = explode ( '=', $argument );
-	if ($argParts [0] == '--email') {
-		$email = $argParts [1];
-	} else if ($argParts [0] == '--pass') {
-		$pass = $argParts [1];
-	}
+  $argParts = explode ( '=', $argument );
+  if ($argParts [0] == '--updatemartins') {
+    $updatemartins = $argParts [1];
+    if ($updatemartins) {
+      require_once 'sm33/martinsupdater.php';
+      updateMartinsFromFile ( $updatemartins, $email, $pass );
+      die ();
+    }
+  }
+  if ($argParts [0] == '--makesql') {
+    $sample = new SimpleCRUD ( $email, $pass );
+    $sample->run ();
+    die ();
+  }
+  if ($argParts [0] == '--listdocs') {
+    $sample = new SimpleCRUD ( $email, $pass );
+    $sample->runListDocs ();
+    die ();
+  }
 }
 
+echo "Use commands
+\t--updatemartins==_file_name_ \t to update matrins.ru price
+\t--makesql                    \t to create SQL file
+\t--listdocs                   \t to list available docs
+";
+
+/*
+// process command line options
 if (($email == null) || ($pass == null)) {
   $email = getInput ( "Please enter your email address [example: username@gmail.com]" );
   $pass = getInput ( "Please enter your password [example: mypassword]" );
 }
 */
 
-$sample = new SimpleCRUD ( $email, $pass );
-$sample->run ();
