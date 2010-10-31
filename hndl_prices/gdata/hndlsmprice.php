@@ -1172,7 +1172,7 @@ $pass = "Rty6$52hgsgt";
 
 //$argv[]='--updatemartins=..\martins\martins.xls';
 //$argv[]='--makesql';
-
+$argv[]='--updatefcenter=..\fcenter\price.html';
 
 foreach ( $argv as $argument ) {
   $argParts = explode ( '=', $argument );
@@ -1194,12 +1194,21 @@ foreach ( $argv as $argument ) {
     $sample->runListDocs ();
     die ();
   }
+  if ($argParts [0] == '--updatefcenter') {
+    $updatefcenter = $argParts [1];
+    if ($updatefcenter) {
+      require_once 'sm33/fcenterupdater.php';
+      updateFCenterFromFile ( $updatefcenter, $email, $pass );
+      die ();
+    }
+  }
 }
 
 echo "Use commands
-\t--updatemartins==_file_name_ \t to update matrins.ru price
+\t--updatemartins=_file_name_  \t to update matrins.ru price
 \t--makesql                    \t to create SQL file
 \t--listdocs                   \t to list available docs
+\t--updatefcenter=_file_name_  \t to update fcenter.ru price
 ";
 
 /*
