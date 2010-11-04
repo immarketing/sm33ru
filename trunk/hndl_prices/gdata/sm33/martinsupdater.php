@@ -66,7 +66,7 @@ class MartinsRuPriceUpdater {
           
           $this->dataGData [$code] [CODE] = $code;
           $this->dataGData [$code] [MODEL] = $mdl;
-          $this->dataGData [$code] [DESCRIPTION] = $this->priceArray [$row][3];
+          //$this->dataGData [$code] [DESCRIPTION] = $this->priceArray [$row][3];
           $this->dataGData [$code] [PRICE] = $prc;
           $this->dataGData [$code] [ISPUBLISHED] = '2';
           $this->dataGData [$code] [UPDATETIME] = date ( 'Ymd H:i:s' );

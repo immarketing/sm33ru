@@ -188,17 +188,34 @@ class GetAvailableDocuments {
     //$i = 0;
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
-      if ("СВЧ печи" === $entry->title->text || //
+      if (
+      
+      "СВЧ печи" === $entry->title->text || //
 
-
+      "Утюги" === $entry->title->text || //
+      
+      "Обогреватели" === $entry->title->text || //
+      
       "Видеокамеры" === $entry->title->text || //
       
+      "Хлебопечи" === $entry->title->text || //
 
       "Кофеварки" === $entry->title->text || //
 
-
-      "Фотоаппараты" === $entry->title->text || "Домашние кинотеатры" === $entry->title->text || "Музыкальные центры" === $entry->title->text || "Телевизоры LED_ LCD" === $entry->title->text || "DVD" === $entry->title->text || "пылесосы" === $entry->title->text || 
+      "Фотоаппараты" === $entry->title->text || 
       
+      "Домашние кинотеатры" === $entry->title->text ||
+       
+      "Музыкальные центры" === $entry->title->text || 
+      
+      "Телевизоры LED_ LCD" === $entry->title->text || 
+      
+      "DVD" === $entry->title->text || 
+      
+      "пылесосы" === $entry->title->text ||
+      
+
+      "Фотообъективы" === $entry->title->text ||
 
       false) {
         //
@@ -618,13 +635,13 @@ EOT_EOT;
       // background-color: powderblue;
       
 
-      $result .= '<tr style="background-color: dodgerblue;"><td colspan="2" rowspan="1"><span style="font-weight: bold;">' . $v [GROUPNAME] . '</span>&nbsp;&nbsp;</td></tr> ';
+      $result .= '<tr style="background-color: rgb(102, 204, 255);"><td colspan="2" rowspan="1" style="padding: 3px;"><span style="font-weight: bold;">' . $v [GROUPNAME] . '</span>&nbsp;&nbsp;</td></tr> ';
       $cnt = 1;
       foreach ( $v [OPTIONS] as $ko => $vo ) {
         
         if ($curProd [$vo] !== "") {
           $result .= '
-  <tr style="' . (($cnt ++) % 2 ? 'background-color: aquamarine;' : 'background-color: powderblue;') . '"><td>&nbsp;&nbsp;&nbsp;' . addslashes ( $vo ) . '</td><td>&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
+  <tr style="' . (($cnt ++) % 2 ? 'background-color: rgb(204, 255, 255);' : 'background-color: rgb(153, 255, 255);') . '"><td style="padding: 3px;">&nbsp;&nbsp;&nbsp;' . addslashes ( $vo ) . '</td><td style="padding: 3px;">&nbsp;' . addslashes ( $curProd [$vo] ) . '</td></tr>
         ';
         
         }
@@ -1170,11 +1187,14 @@ function getInput($text) {
 $email = "sm33.bot@gmail.com";
 $pass = "Rty6$52hgsgt";
 
+
 //$argv[]='--updatemartins=..\martins\martins.xls';
 //$argv[]='--makesql';
-$argv[]='--updatefcenter=..\fcenter\price.html';
+//$argv[]='--updatefcenter=..\fcenter\price.html';
+
 
 foreach ( $argv as $argument ) {
+
   $argParts = explode ( '=', $argument );
   if ($argParts [0] == '--updatemartins') {
     $updatemartins = $argParts [1];
@@ -1205,7 +1225,7 @@ foreach ( $argv as $argument ) {
 }
 
 echo "Use commands
-\t--updatemartins=_file_name_  \t to update matrins.ru price
+\t--updatemartins=_file_name_  \t to update martins.ru price
 \t--makesql                    \t to create SQL file
 \t--listdocs                   \t to list available docs
 \t--updatefcenter=_file_name_  \t to update fcenter.ru price
@@ -1213,6 +1233,16 @@ echo "Use commands
 
 /*
 // process command line options
+echo "Use commands
+\t--updatemartins=_file_name_  \t to update martins.ru price
+\t--makesql                    \t to create SQL file
+\t--listdocs                   \t to list available docs
+\t--updatefcenter=_file_name_  \t to update fcenter.ru price
+";
+
+/*
+// process command line options
+
 if (($email == null) || ($pass == null)) {
   $email = getInput ( "Please enter your email address [example: username@gmail.com]" );
   $pass = getInput ( "Please enter your password [example: mypassword]" );
