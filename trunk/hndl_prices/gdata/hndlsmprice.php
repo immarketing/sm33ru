@@ -213,10 +213,17 @@ class GetAvailableDocuments {
       "DVD" === $entry->title->text || 
       
       "пылесосы" === $entry->title->text ||
-      
 
       "Фотообъективы" === $entry->title->text ||
+      
+      "Блендеры" === $entry->title->text ||
+      
+      "Бритвы" === $entry->title->text ||
+      
+      "Фены" === $entry->title->text ||
 
+      "Мясорубки" === $entry->title->text ||
+      
       false) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
