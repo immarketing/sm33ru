@@ -180,6 +180,22 @@ class GetAvailableDocuments {
   
   }
   
+  public function getCategories() {
+    $res = null;
+    $feed = $this->gdClient->getSpreadsheetFeed ();
+    
+    //$i = 0;
+    foreach ( $feed->entries as $entry ) {
+      //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
+      if ("categories" === $entry->title->text) {
+        $res [URL] = $entry->id->text;
+        $res [NAME] = $entry->title->text;
+      }
+      
+      return $res;
+    }
+  }
+  
   public function getDocsArray() {
     $res = array ();
     
@@ -189,41 +205,47 @@ class GetAvailableDocuments {
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
       if (
-      
+
       "СВЧ печи" === $entry->title->text || //
 
+
       "Утюги" === $entry->title->text || //
-      
+
+
       "Обогреватели" === $entry->title->text || //
-      
+
+
       "Видеокамеры" === $entry->title->text || //
-      
+
+
       "Хлебопечи" === $entry->title->text || //
+
 
       "Кофеварки" === $entry->title->text || //
 
+
       "Фотоаппараты" === $entry->title->text || 
-      
-      "Домашние кинотеатры" === $entry->title->text ||
-       
+
+      "Домашние кинотеатры" === $entry->title->text || 
+
       "Музыкальные центры" === $entry->title->text || 
-      
+
       "Телевизоры LED_ LCD" === $entry->title->text || 
-      
+
       "DVD" === $entry->title->text || 
-      
-      "пылесосы" === $entry->title->text ||
 
-      "Фотообъективы" === $entry->title->text ||
-      
-      "Блендеры" === $entry->title->text ||
-      
-      "Бритвы" === $entry->title->text ||
-      
-      "Фены" === $entry->title->text ||
+      "пылесосы" === $entry->title->text || 
 
-      "Мясорубки" === $entry->title->text ||
-      
+      "Фотообъективы" === $entry->title->text || 
+
+      "Блендеры" === $entry->title->text || 
+
+      "Бритвы" === $entry->title->text || 
+
+      "Фены" === $entry->title->text || 
+
+      "Мясорубки" === $entry->title->text || 
+
       false) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
@@ -245,6 +267,7 @@ class GetAvailableDocuments {
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
+
 class SimpleCRUD {
   /**
    * Constructor
@@ -284,6 +307,26 @@ class SimpleCRUD {
     $this->printFeed ( $feed );
     die ();
   }
+  
+  public function promptForCategoriesSpreadsheet() {
+    $v = &$this->categoriesDoc;
+    
+    $curDoc = $v [URL];
+    $sheet = $this->gdClient->getSpreadsheetEntry ( $curDoc );
+    $currKey = explode ( '/', $sheet->id->text );
+    $v [CURRKEY] = $currKey [5];
+    
+    $query = new Zend_Gdata_Spreadsheets_DocumentQuery ();
+    $query->setSpreadsheetKey ( $v [CURRKEY] );
+    $feed = $this->gdClient->getWorksheetFeed ( $query );  
+    foreach ( $feed->entries as $entry ) {
+      if (strtolower ( $entry->title->text ) === "sheet 1") {
+          $currWkshtIdOpt = explode ( '/', $entry->id->text );
+          $v [CURWKSHT] = $currWkshtIdOpt [8];
+      }
+    }
+  }
+  
   /**
    * promptForSpreadsheet
    *
@@ -666,6 +709,50 @@ EOT_EOT;
     return $result;
   }
   
+  private function loadCategories(){
+    $v = &$this->categoriesDoc;
+    //$v [CURRKEY] = $currKey [5];
+    //$v [CURWKSHT]
+    
+    $datHeaders=$this->getHdrArrays($v [CURRKEY], $v [CURWKSHT]);
+    
+    $datHdrByIndex = $datHeaders ["HdrByIndex"];
+    $datIndexByHdr = $datHeaders ["IndexByHdr"];
+    
+    $query = new Zend_Gdata_Spreadsheets_ListQuery ();
+    $query->setSpreadsheetKey ( $v [CURRKEY] );
+    $query->setWorksheetId ( $v [CURWKSHT] );
+    $this->listFeed = $this->gdClient->getListFeed ( $query );
+    
+    $feed = $this->listFeed;
+    $resultData = null;
+    
+    foreach ( $feed->entries as $entry ) {
+      if ($entry instanceof Zend_Gdata_Spreadsheets_ListEntry) {
+        // getCustomByName
+        $cst = $entry->getCustom ();
+        
+        $nm = $cst [$datIndexByHdr ['name'] - 1]->getText ();
+        $this->categories [$nm] ['id'] = $cst [$datIndexByHdr ['id'] - 1]->getText ();
+        
+        $id =  $this->categories [$nm] ['id'] + 0;
+        
+        if ($id > $this->lastUsedCatID) {
+          $this->lastUsedCatID = $id;
+        }
+        
+        $this->categories [$nm] ['name'] = $nm;
+        $this->categories [$nm] ['selfname'] = $cst [$datIndexByHdr ['selfname'] - 1]->getText ();
+        $this->categories [$nm] ['sm.категория.1'] = $cst [$datIndexByHdr ['sm.категория.1'] - 1]->getText ();
+        $this->categories [$nm] ['sm.категория.2'] = $cst [$datIndexByHdr ['sm.категория.2'] - 1]->getText ();
+        $this->categories [$nm] ['sm.категория.3'] = $cst [$datIndexByHdr ['sm.категория.3'] - 1]->getText ();
+        $this->categories [$nm] ['parentid'] = $cst [$datIndexByHdr ['parentid'] - 1]->getText ();
+      }
+      
+    }
+    $this->lastUsedCatID ++;
+  }
+  
   public function hndlData($theKey) {
     $datHeaders = $this->getDataHdrArrays ( $theKey );
     
@@ -691,7 +778,7 @@ EOT_EOT;
         $curMrkYaRu = $cst [$datIndexByHdr ["market.yandex.ru"] - 1]->getText ();
         $curIsPblshd = $cst [$datIndexByHdr [SM_IS_PUBLISHED] - 1]->getText ();
         
-        if (!$curIsPblshd){
+        if (! $curIsPblshd) {
           continue;
         }
         
@@ -1003,7 +1090,20 @@ EOT_EOT;
     }
   }
   
+  private function writeCategoriesToTempFile() {
+    $csvile = @fopen ( "tmp/categories.csv", "w" );
+    $catInfo = array ('id', 'name', 'selfname', 'sm.категория.1', 'sm.категория.2', 'sm.категория.3', 'parentid' );
+    fputcsv ( $csvile, $catInfo );
+    
+    foreach ( $this->categories as $k => $v ) {
+      $catInfo = array ($v ['id'], $v ['name'], $v ['selfname'], $v ['sm.категория.1'], $v ['sm.категория.2'], $v ['sm.категория.3'], $v ['parentid'] );
+      fputcsv ( $csvile, $catInfo );
+    }
+    fclose ( $csvile );
+  }
+  
   private function recalcCategories() {
+    return;
     $minID = 2000;
     foreach ( $this->categories as $k => $v ) {
       $this->categories [$k] ["id"] = $minID + $this->categories [$k] ["id"];
@@ -1118,7 +1218,7 @@ EOT_EOT;
   }
   
   public function runListDocs() {
-    $this->listSpreadsheets();
+    $this->listSpreadsheets ();
   }
   /**
    * run
@@ -1132,6 +1232,10 @@ EOT_EOT;
     
     $this->workDocs = $docs;
     
+    $this->categoriesDoc = $docList->getCategories ();
+    
+    $this->promptForCategoriesSpreadsheet();
+    $this->loadCategories();
     $this->promptForSpreadsheet ();
     
     foreach ( $this->workDocs as $k => $v ) {
@@ -1152,6 +1256,7 @@ EOT_EOT;
     }
     
     $this->recalcCategories ();
+    $this->writeCategoriesToTempFile ();
     
     foreach ( $this->workDocs as $k => $v ) {
       //print ' | ' . $k . ' | ' . $v . "\n";
@@ -1194,14 +1299,13 @@ function getInput($text) {
 $email = "sm33.bot@gmail.com";
 $pass = "Rty6$52hgsgt";
 
-
 //$argv[]='--updatemartins=..\martins\martins.xls';
 //$argv[]='--makesql';
 //$argv[]='--updatefcenter=..\fcenter\price.html';
 
 
 foreach ( $argv as $argument ) {
-
+  
   $argParts = explode ( '=', $argument );
   if ($argParts [0] == '--updatemartins') {
     $updatemartins = $argParts [1];
