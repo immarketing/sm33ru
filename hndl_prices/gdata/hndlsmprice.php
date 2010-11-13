@@ -190,10 +190,12 @@ class GetAvailableDocuments {
       if ("categories" === $entry->title->text) {
         $res [URL] = $entry->id->text;
         $res [NAME] = $entry->title->text;
-      }
+        return $res;
       
-      return $res;
+      }
     }
+    
+    return $res;
   }
   
   public function getDocsArray() {
@@ -205,7 +207,7 @@ class GetAvailableDocuments {
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
       if (
-
+      
       "СВЧ печи" === $entry->title->text || //
 
 
@@ -244,7 +246,9 @@ class GetAvailableDocuments {
 
       "Фены" === $entry->title->text || 
 
-      "Мясорубки" === $entry->title->text || 
+      "Мясорубки" === $entry->title->text ||
+
+      "Ноутбуки" === $entry->title->text || 
 
       false) {
         //
@@ -318,11 +322,11 @@ class SimpleCRUD {
     
     $query = new Zend_Gdata_Spreadsheets_DocumentQuery ();
     $query->setSpreadsheetKey ( $v [CURRKEY] );
-    $feed = $this->gdClient->getWorksheetFeed ( $query );  
+    $feed = $this->gdClient->getWorksheetFeed ( $query );
     foreach ( $feed->entries as $entry ) {
       if (strtolower ( $entry->title->text ) === "sheet 1") {
-          $currWkshtIdOpt = explode ( '/', $entry->id->text );
-          $v [CURWKSHT] = $currWkshtIdOpt [8];
+        $currWkshtIdOpt = explode ( '/', $entry->id->text );
+        $v [CURWKSHT] = $currWkshtIdOpt [8];
       }
     }
   }
@@ -709,12 +713,13 @@ EOT_EOT;
     return $result;
   }
   
-  private function loadCategories(){
+  private function loadCategories() {
     $v = &$this->categoriesDoc;
     //$v [CURRKEY] = $currKey [5];
     //$v [CURWKSHT]
     
-    $datHeaders=$this->getHdrArrays($v [CURRKEY], $v [CURWKSHT]);
+
+    $datHeaders = $this->getHdrArrays ( $v [CURRKEY], $v [CURWKSHT] );
     
     $datHdrByIndex = $datHeaders ["HdrByIndex"];
     $datIndexByHdr = $datHeaders ["IndexByHdr"];
@@ -735,7 +740,7 @@ EOT_EOT;
         $nm = $cst [$datIndexByHdr ['name'] - 1]->getText ();
         $this->categories [$nm] ['id'] = $cst [$datIndexByHdr ['id'] - 1]->getText ();
         
-        $id =  $this->categories [$nm] ['id'] + 0;
+        $id = $this->categories [$nm] ['id'] + 0;
         
         if ($id > $this->lastUsedCatID) {
           $this->lastUsedCatID = $id;
@@ -748,7 +753,7 @@ EOT_EOT;
         $this->categories [$nm] ['sm.категория.3'] = $cst [$datIndexByHdr ['sm.категория.3'] - 1]->getText ();
         $this->categories [$nm] ['parentid'] = $cst [$datIndexByHdr ['parentid'] - 1]->getText ();
       }
-      
+    
     }
     $this->lastUsedCatID ++;
   }
@@ -1234,8 +1239,8 @@ EOT_EOT;
     
     $this->categoriesDoc = $docList->getCategories ();
     
-    $this->promptForCategoriesSpreadsheet();
-    $this->loadCategories();
+    $this->promptForCategoriesSpreadsheet ();
+    $this->loadCategories ();
     $this->promptForSpreadsheet ();
     
     foreach ( $this->workDocs as $k => $v ) {
@@ -1300,7 +1305,7 @@ $email = "sm33.bot@gmail.com";
 $pass = "Rty6$52hgsgt";
 
 //$argv[]='--updatemartins=..\martins\martins.xls';
-//$argv[]='--makesql';
+$argv [] = '--makesql';
 //$argv[]='--updatefcenter=..\fcenter\price.html';
 
 
