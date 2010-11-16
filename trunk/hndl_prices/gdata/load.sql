@@ -15,6 +15,8 @@ quit
 
 mysql --default-character-set=Utf8 -u suupermarkt -pMarKt3687Jhhdj suupermarkt <cats.sql
 
+mysql --default-character-set=Utf8 -u suupermarkt -pMarKt3687Jhhdj suupermarkt <~cats.sql
+
 LOAD DATA INFILE 'jos_vm_category_xref.sql' INTO TABLE jos_vm_category_xref;
 
 \ cats.sql;

@@ -20,8 +20,7 @@ class MartinsRuPriceUpdater {
     $client = Zend_Gdata_ClientLogin::getHttpClient ( $this->email, $this->password, $service );
     //$client=$this->gConnector->getGDClient();
     $docs = new Zend_Gdata_Docs ( $client );
-    $newDocumentEntry = $docs->uploadFile($fName, $realName,
-      null, Zend_Gdata_Docs::DOCUMENTS_LIST_FEED_URI);
+    $newDocumentEntry = $docs->uploadFile ( $fName, $realName, null, Zend_Gdata_Docs::DOCUMENTS_LIST_FEED_URI );
   }
   
   public function updateColumn($pName, $cl, $vl) {
@@ -172,7 +171,18 @@ class MartinsRuPriceUpdater {
     $query = new Zend_Gdata_Spreadsheets_ListQuery ();
     $query->setSpreadsheetKey ( $this->mrtnsPrice->getSpreadsheetID () );
     $query->setWorksheetId ( $this->mrtnsPrice->getWorksheetID ( 'Sheet 1' ) );
-    $this->dataFeed = $this->gConnector->getGDClient ()->getListFeed ( $query );
+    
+    for($i = 1; $i <= 10; $i ++) {
+      try {
+        $this->dataFeed = $this->gConnector->getGDClient ()->getListFeed ( $query );
+        break;
+      } catch ( Exception $e ) {
+        if ($i==10){
+          throw $e;
+        }
+        continue;
+      }
+    }
     
     foreach ( $this->dataFeed->entries as $entry ) {
       $cst = $entry->getCustom ();

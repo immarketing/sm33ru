@@ -237,7 +237,7 @@ class GetAvailableDocuments {
       "DVD" === $entry->title->text || 
 
       "пылесосы" === $entry->title->text || 
-
+      
       "Фотообъективы" === $entry->title->text || 
 
       "Блендеры" === $entry->title->text || 
@@ -249,7 +249,6 @@ class GetAvailableDocuments {
       "Мясорубки" === $entry->title->text ||
 
       "Ноутбуки" === $entry->title->text || 
-
       false) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
@@ -1305,7 +1304,7 @@ $email = "sm33.bot@gmail.com";
 $pass = "Rty6$52hgsgt";
 
 //$argv[]='--updatemartins=..\martins\martins.xls';
-$argv [] = '--makesql';
+//$argv [] = '--makesql';
 //$argv[]='--updatefcenter=..\fcenter\price.html';
 
 
