@@ -248,7 +248,7 @@ class GetAvailableDocuments {
 
       "Мясорубки" === $entry->title->text ||
 
-      "Ноутбуки" === $entry->title->text || 
+      "Ноутбуки laptopscope" === $entry->title->text || 
       false) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
