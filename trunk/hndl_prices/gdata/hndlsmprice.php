@@ -57,12 +57,20 @@ define ( "SM_IS_PUBLISHED", "sm.публиковать", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 
 define ( "SM_INTERNAL_IDENTIFICATOR", "sm.internal.identificator", true );
+define ( "SM_INTERNAL_RECALC_ID", "sm.internal.recacl.id", true );
 define ( "SM_INTERNAL_PRODUCTDESCRIPTION", "sm.product.description", true );
 define ( "SM_INTERNAL_PRODUCTSQLINSERTS", "sm.product.SQLinserts", true );
 
 define ( "SM_INTERNAL_FULLPICTURL", "sm.product.fullpicturl", true );
+define ( "SM_INTERNAL_ID", "sm.sm33.id", true );
 
 define ( "SM_INTERNAL_PRICE", "sm.цена", true );
+
+define ( "ADV_GGL_KEYWORDS", "advert.google.key_words", true );
+define ( "ADV_GGL_WRITE", "advert.google.write_adv", true );
+
+define ( "SM_ADV_NAME", "sm.adv.name", true );
+
 /*
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
@@ -199,6 +207,30 @@ class GetAvailableDocuments {
   }
   
   public function getDocsArray() {
+    $prodNames = array ("СВЧ печи" => "свч", "Утюги" => "утюг", "Обогреватели" => "", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч" );
+    $prodKeyWords = array (
+    "СВЧ печи" => "свч, микроволновка, микроволновки", 
+    "Утюги" => "утюг, утюги", 
+    "Обогреватели" => "обогреватель, масляный обогреватель", 
+    "Видеокамеры" => "видеокамера, видеокамеры", 
+    "Хлебопечи" => "Хлебопечи, хлебопечь", 
+    "Кофеварки" => "Кофеварки, Кофеварка", 
+    "Фотоаппараты" => "Фотоаппарат,Фотоаппараты", 
+    "Домашние кинотеатры" => "Домашние кинотеатры, Домашний кинотеатр, DVD, blu-ray", 
+    "Музыкальные центры" => "Музыкальные центры, Музыкальный центр", 
+    "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", 
+    "DVD" => "DVD, blu-ray", 
+    "пылесосы" => "пылесосы, пылесос", 
+    "Фотообъективы" => "Фотообъективы,Фотообъектив", 
+    "Блендеры" => "Блендеры, Блендер", 
+    "Бритвы" => "Бритвы, Бритва", 
+    "Фены" => "Фены, Фен", 
+    "Мясорубки" => "Мясорубки, Мясорубка", 
+    "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки" 
+    );
+    $prodWriteAdv = array (
+    "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки" 
+    );
     $res = array ();
     
     $feed = $this->gdClient->getSpreadsheetFeed ();
@@ -206,9 +238,7 @@ class GetAvailableDocuments {
     //$i = 0;
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
-      if (
-      
-      "СВЧ печи" === $entry->title->text || //
+      if ( "СВЧ печи" === $entry->title->text || //
 
 
       "Утюги" === $entry->title->text || //
@@ -237,7 +267,7 @@ class GetAvailableDocuments {
       "DVD" === $entry->title->text || 
 
       "пылесосы" === $entry->title->text || 
-      
+
       "Фотообъективы" === $entry->title->text || 
 
       "Блендеры" === $entry->title->text || 
@@ -246,13 +276,17 @@ class GetAvailableDocuments {
 
       "Фены" === $entry->title->text || 
 
-      "Мясорубки" === $entry->title->text ||
+      "Мясорубки" === $entry->title->text || 
+      
 
       "Ноутбуки laptopscope" === $entry->title->text || 
+
       false) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
         $res [$entry->title->text] [NAME] = $entry->title->text;
+        $res [$entry->title->text] [ADV_GGL_KEYWORDS] = $prodKeyWords [$entry->title->text];
+        $res [$entry->title->text] [ADV_GGL_WRITE] = $prodWriteAdv [$entry->title->text];
       }
       //$i ++;
     }
@@ -591,6 +625,8 @@ class SimpleCRUD {
     
     $fDesc = addslashes ( $curProd [SM_INTERNAL_PRODUCTDESCRIPTION] );
     
+    $curProd [SM_INTERNAL_ID] = $curID;
+    
     $cName = $curProd [SM_CATEGORY_LEVEL_1] . "/" . $curProd [SM_CATEGORY_LEVEL_2] . "/" . $curProd [SM_CATEGORY_LEVEL_3];
     $catID = $this->categories [$cName] ["id"];
     
@@ -778,9 +814,25 @@ EOT_EOT;
         // getCustomByName
         $cst = $entry->getCustom ();
         //print $i . ' pp ==  ' . $cst [$optIndexByHdr ["ПроБа пера"] - 1]->getText() . "\n";
-        $curDat = $cst [$datIndexByHdr ["Код"] - 1]->getText ();
-        $curMrkYaRu = $cst [$datIndexByHdr ["market.yandex.ru"] - 1]->getText ();
-        $curIsPblshd = $cst [$datIndexByHdr [SM_IS_PUBLISHED] - 1]->getText ();
+        try {
+          $curDat = $cst [$datIndexByHdr ["Код"] - 1]->getText ();
+        } catch ( Exception $e ) {
+          $curDat = null;
+        }
+        try {
+          $curMrkYaRu = $cst [$datIndexByHdr ["market.yandex.ru"] - 1]->getText ();
+        } catch ( Exception $e ) {
+          $curMrkYaRu = null;
+        }
+        try {
+          if (! $cst [$datIndexByHdr [SM_IS_PUBLISHED] - 1]) {
+            $curIsPblshd = null;
+          } else {
+            $curIsPblshd = $cst [$datIndexByHdr [SM_IS_PUBLISHED] - 1]->getText ();
+          }
+        } catch ( Exception $e ) {
+          $curIsPblshd = null;
+        }
         
         if (! $curIsPblshd) {
           continue;
@@ -820,6 +872,7 @@ EOT_EOT;
         $resultData [$curDat] ['Артикул'] = "ELC$id";
         $resultData [$curDat] [SM_CATEGORY_REFERENCE] = $catRName;
         $resultData [$curDat] [SM_INTERNAL_IDENTIFICATOR] = $curDat;
+        $resultData [$curDat] [SM_INTERNAL_RECALC_ID] = $id;
         $resultData [$curDat] [SM_INTERNAL_PRODUCTDESCRIPTION] = $this->createProdDescription ( $resultData [$curDat], $theKey );
         //Ссылка на картинку
         $resultData [$curDat] [SM_INTERNAL_FULLPICTURL] = $resultData [$curDat] ['Ссылка на картинку'];
@@ -1094,6 +1147,135 @@ EOT_EOT;
     }
   }
   
+  private function getEmptyGoogleAdvertisingArray() {
+    return array ('Реклама магазина SuperMarket33.ru', '', '', '', '', '', '', '', '', 'active', 'active', 'active', 'active', 'add' );
+  }
+  
+  private function to1251(&$iArr){
+    $res = array();
+    foreach ( $iArr as $k => $v ) {
+      //$res[]=mb_convert_encoding($v,"Windows-1251",'UTF-8');
+      $res[]=iconv ( 'UTF-8' , "Windows-1251", $v );
+    }
+    return $res;
+  }
+  private function writeGoogleAdvertisingGroupToTempFile($destFile, $docInfo, $prodInfo) {
+    // одна группа на один продукт
+    if (! $prodInfo['sm.публиковать'] ){
+      return;
+    }
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ();
+    $prodName = $prodInfo [SM_ADV_NAME];
+    if (! $prodName) {
+      $prodName = $prodInfo ['Наименование'];
+    }
+    
+    $groupName = "Реклама для [" . $prodName . "]";
+    
+    $advInfo [1] = $groupName;
+    
+    //array ($dv [SM_INTERNAL_IDENTIFICATOR] );
+    fputcsv ( $destFile, $this->to1251($advInfo) );
+    
+    return $groupName;
+  
+  }
+  
+  private function writeGoogleAdvertisingMessagesToTempFile($destFile, $docInfo, $prodInfo, $groupName) {
+    // одно/несколько объявлений на продукт
+    if (! $prodInfo['sm.публиковать'] ){
+      return;
+    }
+    
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ();
+    $prodName = $prodInfo [SM_ADV_NAME];
+    $prodName = $prodInfo [SM_ADV_NAME];
+    if (! $prodName) {
+      $prodName = $prodInfo ['Наименование'];
+    }
+    
+    $prodID = $prodInfo [SM_INTERNAL_RECALC_ID];
+    
+    $prodPrice = $prodInfo [SM_INTERNAL_PRICE];
+    $advInfo [1] = $groupName;
+    //Купи свч daewoo kor-4125a	Доставка бесплатно	Цена в Коврове 1660 руб.	www.supermarket33.ru
+    // http://www.supermarket33.ru/index.php?page=shop.product_details&product_id=2007987&option=com_virtuemart
+    
+
+    $advInfo [4] = strtolower ( $prodName );
+    $advInfo [5] = 'Доставка бесплатно';
+    $advInfo [6] = 'Купи в Коврове ' . $prodPrice . 'р';
+    $advInfo [7] = 'www.supermarket33.ru';
+    $advInfo [8] = 'http://www.supermarket33.ru/index.php?page=shop.product_details&product_id=' . ($prodID) . '&option=com_virtuemart';
+    
+    fputcsv ( $destFile, $this->to1251($advInfo) );
+  
+  }
+  
+  private function writeGoogleAdvertisingKeyWordsToTempFile($destFile, $docInfo, $prodInfo, $groupName) {
+    if (! $prodInfo['sm.публиковать'] ){
+      return;
+    }
+    
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ();
+    $prodName = $prodInfo [SM_ADV_NAME];
+    if (! $prodName) {
+      $prodName = $prodInfo ['Наименование'];
+    }
+    $firmName = $prodInfo ['Производитель'];
+    
+    $kWords = $docInfo [ADV_GGL_KEYWORDS];
+    
+    $kwArray = preg_split ( '/,/', $kWords );
+    
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ();
+    $advInfo [1] = $groupName;
+    $advInfo [3] = 'Broad';
+    
+    $advInfo [2] = $prodName;
+    fputcsv ( $destFile, $this->to1251($advInfo) );
+    
+    $advInfo [2] = $prodInfo ['Наименование'];
+    fputcsv ( $destFile, $this->to1251($advInfo ));
+    
+    foreach ( $kwArray as $k => $v ) {
+      $advInfo [2] = $v . ' ' . $prodName;
+      fputcsv ( $destFile, $this->to1251($advInfo ));
+      
+      $advInfo [2] = $v . ' ' . $prodInfo ['Наименование'];
+      fputcsv ( $destFile, $this->to1251($advInfo ));
+      
+      $advInfo [2] = $v . ' ' . $firmName;
+      fputcsv ( $destFile, $this->to1251($advInfo) );
+    }
+  
+  }
+  
+  private function writeGoogleAdvertisingToTempFile() {
+    $csvile = @fopen ( "tmp/adv_google.csv", "w" );
+    //$advInfo = array ('id', 'name', 'selfname', 'sm.категория.1', 'sm.категория.2', 'sm.категория.3', 'parentid' );
+    $advInfo = array ('Campaign', 'Ad Group', 'Keyword', 'Keyword Type', 'Headline', 'Description Line 1', 'Description Line 2', 'Display URL', 'Destination URL', 'Campaign Status', 'AdGroup Status', 'Creative Status', 'Keyword Status', 'Suggested Changes' );
+    
+    fputcsv ( $csvile, $advInfo );
+    
+    foreach ( $this->workDocs as $k => $v ) {
+      $data = $this->workDocs [$k] [DATA];
+      if (! $this->workDocs [$k] [ADV_GGL_WRITE]){
+        continue;
+      }
+      //echo "$k == $v\n";
+      foreach ( $data as $dk => $dv ) {
+        $gName = $this->writeGoogleAdvertisingGroupToTempFile ( $csvile, $v, $dv );
+        $this->writeGoogleAdvertisingMessagesToTempFile ( $csvile, $v, $dv, $gName );
+        $this->writeGoogleAdvertisingKeyWordsToTempFile ( $csvile, $v, $dv, $gName );
+      }
+      ;
+    
+    }
+    fclose ( $csvile );
+  
+  }
+  
   private function writeCategoriesToTempFile() {
     $csvile = @fopen ( "tmp/categories.csv", "w" );
     $catInfo = array ('id', 'name', 'selfname', 'sm.категория.1', 'sm.категория.2', 'sm.категория.3', 'parentid' );
@@ -1119,7 +1301,9 @@ EOT_EOT;
     $res = "";
     foreach ( $this->workDocs as $k => $v ) {
       $data = $this->workDocs [$k] [DATA];
+      echo "$k == $v\n";
       foreach ( $data as $dk => $dv ) {
+        //echo "$dk == $dv\n"
         // $resultData [$curDat] [SM_INTERNAL_PRODUCTSQLINSERTS] = $this->createProdSQLInsert ( $resultData [$curDat] );
         ;
         $curID = 2000000 + $dv ['Код'];
@@ -1272,6 +1456,8 @@ EOT_EOT;
     $this->loadPImagesFromWeb ();
     
     $this->createAndWriteSQLs ();
+    
+    $this->writeGoogleAdvertisingToTempFile ();
     die ( "\nAll done                   \n" );
     
     /*
