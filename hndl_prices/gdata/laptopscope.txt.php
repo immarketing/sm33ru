@@ -7,6 +7,31 @@ function trimUnusedChars($pt) {
   return $pt;
 }
 
+function loadStartPage() {
+  // 
+  try {
+    $url = 'http://www.laptopscope.ru/catalog/category/brand.htm';
+    $fpout = @fopen ( "../laptopscope/brand.htm", "w" );
+    if ($fpout) {
+      $ch = curl_init ();
+      curl_setopt ( $ch, CURLOPT_URL, $url );
+      curl_setopt ( $ch, CURLOPT_FILE, $fpout );
+      curl_setopt ( $ch, CURLOPT_HEADER, 0 );
+      
+      curl_exec ( $ch );
+      fclose ( $fpout );
+      return true;
+    }
+  } catch ( Exception $e ) {
+    throw $e;
+  }
+        return false;
+  
+}
+
+if (!loadStartPage()){
+  die ("UNKNOWN ERROR!\n");
+}
 $fName = '../laptopscope/brand.htm';
 $fp = @fopen ( $fName, "r" );
 $buffer = '';
