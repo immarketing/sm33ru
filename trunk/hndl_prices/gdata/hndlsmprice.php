@@ -208,32 +208,8 @@ class GetAvailableDocuments {
   
   public function getDocsArray() {
     $prodNames = array ("СВЧ печи" => "свч", "Утюги" => "утюг", "Обогреватели" => "", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч" );
-    $prodKeyWords = array (
-    "СВЧ печи" => "свч, микроволновка, микроволновки", 
-    "Утюги" => "утюг, утюги", 
-    "Обогреватели" => "обогреватель, масляный обогреватель", 
-    "Видеокамеры" => "видеокамера, видеокамеры", 
-    "Хлебопечи" => "Хлебопечи, хлебопечь", 
-    "Кофеварки" => "Кофеварки, Кофеварка", 
-    "Фотоаппараты" => "Фотоаппарат,Фотоаппараты", 
-    "Домашние кинотеатры" => "Домашние кинотеатры, Домашний кинотеатр, DVD, blu-ray", 
-    "Музыкальные центры" => "Музыкальные центры, Музыкальный центр", 
-    "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", 
-    "DVD" => "DVD, blu-ray", 
-    "пылесосы" => "пылесосы, пылесос", 
-    "Фотообъективы" => "Фотообъективы,Фотообъектив", 
-    "Блендеры" => "Блендеры, Блендер", 
-    "Бритвы" => "Бритвы, Бритва", 
-    "Фены" => "Фены, Фен", 
-    "Мясорубки" => "Мясорубки, Мясорубка", 
-    "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки" 
-    );
-    $prodWriteAdv = array (
-    "СВЧ печи" => "свч, микроволновка, микроволновки", 
-    "Хлебопечи" => "Хлебопечи, хлебопечь", 
-    "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", 
-    "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки" 
-    );
+    $prodKeyWords = array ("СВЧ печи" => "свч, микроволновка, микроволновки", "Утюги" => "утюг, утюги", "Обогреватели" => "обогреватель, масляный обогреватель", "Видеокамеры" => "видеокамера, видеокамеры", "Хлебопечи" => "Хлебопечи, хлебопечь", "Кофеварки" => "Кофеварки, Кофеварка", "Фотоаппараты" => "Фотоаппарат,Фотоаппараты", "Домашние кинотеатры" => "Домашние кинотеатры, Домашний кинотеатр, DVD, blu-ray", "Музыкальные центры" => "Музыкальные центры, Музыкальный центр", "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", "DVD" => "DVD, blu-ray", "пылесосы" => "пылесосы, пылесос", "Фотообъективы" => "Фотообъективы,Фотообъектив", "Блендеры" => "Блендеры, Блендер", "Бритвы" => "Бритвы, Бритва", "Фены" => "Фены, Фен", "Мясорубки" => "Мясорубки, Мясорубка", "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки" );
+    $prodWriteAdv = array ("СВЧ печи" => "свч, микроволновка, микроволновки", "Хлебопечи" => "Хлебопечи, хлебопечь", "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки" );
     $res = array ();
     
     $feed = $this->gdClient->getSpreadsheetFeed ();
@@ -241,7 +217,7 @@ class GetAvailableDocuments {
     //$i = 0;
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
-      if ( "СВЧ печи" === $entry->title->text || //
+      if ("СВЧ печи" === $entry->title->text || //
 
 
       "Утюги" === $entry->title->text || //
@@ -280,7 +256,6 @@ class GetAvailableDocuments {
       "Фены" === $entry->title->text || 
 
       "Мясорубки" === $entry->title->text || 
-      
 
       "Ноутбуки laptopscope" === $entry->title->text || 
 
@@ -1154,17 +1129,17 @@ EOT_EOT;
     return array ('Реклама магазина SuperMarket33.ru', '', '', '', '', '', '', '', '', 'active', 'active', 'active', 'active', 'add' );
   }
   
-  private function to1251(&$iArr){
-    $res = array();
+  private function to1251(&$iArr) {
+    $res = array ();
     foreach ( $iArr as $k => $v ) {
       //$res[]=mb_convert_encoding($v,"Windows-1251",'UTF-8');
-      $res[]=iconv ( 'UTF-8' , "Windows-1251", $v );
+      $res [] = iconv ( 'UTF-8', "Windows-1251", $v );
     }
     return $res;
   }
   private function writeGoogleAdvertisingGroupToTempFile($destFile, $docInfo, $prodInfo) {
     // одна группа на один продукт
-    if (! $prodInfo['sm.публиковать'] ){
+    if (! $prodInfo ['sm.публиковать']) {
       return;
     }
     $advInfo = $this->getEmptyGoogleAdvertisingArray ();
@@ -1172,13 +1147,14 @@ EOT_EOT;
     if (! $prodName) {
       $prodName = $prodInfo ['Наименование'];
     }
+    $prodName = $prodName . '^' . $prodInfo ['Код'];
     
     $groupName = "Реклама для [" . $prodName . "]";
     
     $advInfo [1] = $groupName;
     
     //array ($dv [SM_INTERNAL_IDENTIFICATOR] );
-    fputcsv ( $destFile, $this->to1251($advInfo) );
+    fputcsv ( $destFile, $this->to1251 ( $advInfo ) );
     
     return $groupName;
   
@@ -1186,7 +1162,7 @@ EOT_EOT;
   
   private function writeGoogleAdvertisingMessagesToTempFile($destFile, $docInfo, $prodInfo, $groupName) {
     // одно/несколько объявлений на продукт
-    if (! $prodInfo['sm.публиковать'] ){
+    if (! $prodInfo ['sm.публиковать']) {
       return;
     }
     
@@ -1211,12 +1187,12 @@ EOT_EOT;
     $advInfo [7] = 'www.supermarket33.ru';
     $advInfo [8] = 'http://www.supermarket33.ru/index.php?page=shop.product_details&product_id=' . ($prodID) . '&option=com_virtuemart';
     
-    fputcsv ( $destFile, $this->to1251($advInfo) );
+    fputcsv ( $destFile, $this->to1251 ( $advInfo ) );
   
   }
   
   private function writeGoogleAdvertisingKeyWordsToTempFile($destFile, $docInfo, $prodInfo, $groupName) {
-    if (! $prodInfo['sm.публиковать'] ){
+    if (! $prodInfo ['sm.публиковать']) {
       return;
     }
     
@@ -1236,20 +1212,20 @@ EOT_EOT;
     $advInfo [3] = 'Broad';
     
     $advInfo [2] = $prodName;
-    fputcsv ( $destFile, $this->to1251($advInfo) );
+    fputcsv ( $destFile, $this->to1251 ( $advInfo ) );
     
     $advInfo [2] = $prodInfo ['Наименование'];
-    fputcsv ( $destFile, $this->to1251($advInfo ));
+    fputcsv ( $destFile, $this->to1251 ( $advInfo ) );
     
     foreach ( $kwArray as $k => $v ) {
       $advInfo [2] = $v . ' ' . $prodName;
-      fputcsv ( $destFile, $this->to1251($advInfo ));
+      fputcsv ( $destFile, $this->to1251 ( $advInfo ) );
       
       $advInfo [2] = $v . ' ' . $prodInfo ['Наименование'];
-      fputcsv ( $destFile, $this->to1251($advInfo ));
+      fputcsv ( $destFile, $this->to1251 ( $advInfo ) );
       
       $advInfo [2] = $v . ' ' . $firmName;
-      fputcsv ( $destFile, $this->to1251($advInfo) );
+      fputcsv ( $destFile, $this->to1251 ( $advInfo ) );
     }
   
   }
@@ -1263,7 +1239,7 @@ EOT_EOT;
     
     foreach ( $this->workDocs as $k => $v ) {
       $data = $this->workDocs [$k] [DATA];
-      if (! $this->workDocs [$k] [ADV_GGL_WRITE]){
+      if (! $this->workDocs [$k] [ADV_GGL_WRITE]) {
         continue;
       }
       //echo "$k == $v\n";
