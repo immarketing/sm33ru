@@ -1,4 +1,9 @@
 <?php
+function timeStampedEcho($outSt) {
+  $t = date ( 'Ymd H:i:s' );
+  echo "[$t]\t$outSt";
+}
+
 function trimUnusedChars($pt) {
   $pt = preg_replace ( "/\n/ims", '', $pt );
   $pt = preg_replace ( "/\r/ims", '', $pt );
@@ -41,7 +46,8 @@ function loadFile($fName) {
 
 function getProdRows($ldd) {
   $rws = array ();
-  echo preg_match_all ( '/<tr[^>]*?class=\"product_row\"[^>]*?>(.*?)<\/tr>/ims', $ldd, $rws );
+  //echo 
+  preg_match_all ( '/<tr[^>]*?class=\"product_row\"[^>]*?>(.*?)<\/tr>/ims', $ldd, $rws );
   //foreach ( $rws as $k => $v ) {
   //  echo $k . "\t====\t" . $v . "\n";
   //}
@@ -49,15 +55,6 @@ function getProdRows($ldd) {
 }
 
 function splitProductInfo($prodText) {
-  // <p>Товар №: 
-  //$res = preg_match ( "/<p>Товар №: ([^<]*?)</ims", $prodText, $nInfo );
-  $res = preg_match ( "/<p>[^:]*?: ([^<]*?)</ims", $prodText, $nInfo );
-  //echo $res."\n";
-  if (! $res) {
-    return null;
-  }
-  $prodInfo [] = $nInfo [1];
-  
   $res = preg_match ( "/<h1><a[^>]*?>([^<]*?)</ims", $prodText, $nInfo );
   if (! $res) {
     return null;
@@ -70,17 +67,28 @@ function splitProductInfo($prodText) {
   }
   $prodInfo [] = $nInfo [1];
   
+  // <p>Товар №: 
+  //$res = preg_match ( "/<p>Товар №: ([^<]*?)</ims", $prodText, $nInfo );
+  $res = preg_match ( "/<p>[^:]*?: ([^<]*?)</ims", $prodText, $nInfo );
+  //echo $res."\n";
+  if (! $res) {
+    return null;
+  }
+  $prodInfo [] = $nInfo [1];
+  
   $res = preg_match ( "/<span[^c]*?class=\"price[^>]*?>([^<]*?)</ims", $prodText, $nInfo );
   if (! $res) {
     return null;
   }
   $prodInfo [] = $nInfo [1];
-    
+  
+  $res = preg_match ( "/<h1><a[^h]*?href=\"([^\"]*?)\"/ims", $prodText, $nInfo );
+  if (! $res) {
+    return null;
+  }
+  $prodInfo [] = 'http://www.pleer.ru' . $nInfo [1];
+  
   return $prodInfo;
-}
-
-if (! loadStartPage ( 'http://pleer.ru/eletr-knigi.html', "./tmp/pleer.ru/eletr-knigi.html" )) {
-  die ( "UNKNOWN ERROR!\n" );
 }
 
 function storeCVS($arr, $fName) {
@@ -93,25 +101,51 @@ function storeCVS($arr, $fName) {
   fclose ( $csvProps );
 }
 
-$loaded = loadFile ( "./tmp/pleer.ru/eletr-knigi.html" );
-$loaded = trimUnusedChars ( $loaded );
-//echo $loaded."\n";
-
-
-$rws = getProdRows ( $loaded );
-//$rws = $rws[0];
-
-
-$prodInfoArray = array ();
-$hdr=array('code','name','desc','price');
-$prodInfoArray[]=$hdr;
-foreach ( $rws as $k => $v ) {
-  //echo $k . "\t====\t" . $v . "\n";
-  $rw = splitProductInfo ( $v );
-  if (! $rw) {
-    continue;
+function loadPleerRuPrice($sourceURL, $tmpFName, $cvsFName) {
+  //if (! loadStartPage ( 'http://pleer.ru/eletr-knigi.html', "./tmp/pleer.ru/eletr-knigi.html" )) {
+  timeStampedEcho ( "Handling [$sourceURL]\n" );
+  if (! loadStartPage ( $sourceURL, $tmpFName )) {
+    die ( "UNKNOWN ERROR!\n" );
   }
-  $prodInfoArray [] = $rw;
+  timeStampedEcho ( "[$sourceURL] loaded\n" );
+  
+  //$loaded = loadFile ( "./tmp/pleer.ru/eletr-knigi.html" );
+  
+
+  $loaded = loadFile ( $tmpFName );
+  timeStampedEcho ( "[$sourceURL] readed in memory\n" );
+  $loaded = trimUnusedChars ( $loaded );
+  //echo $loaded."\n";
+  
+
+  $rws = getProdRows ( $loaded );
+  timeStampedEcho ( "[$sourceURL] trimmed in lines\n" );
+  //$rws = $rws[0];
+  
+
+  $prodInfoArray = array ();
+  $hdr = array ('name', 'description', 'pleer_ru_code', 'pleer_ru_price', 'pleer_ru_url' );
+  $prodInfoArray [] = $hdr;
+  foreach ( $rws as $k => $v ) {
+    //echo $k . "\t====\t" . $v . "\n";
+    $rw = splitProductInfo ( $v );
+    if (! $rw) {
+      continue;
+    }
+    $prodInfoArray [] = $rw;
+  }
+  
+  //storeCVS ( $prodInfoArray, "tmp/pleer_elbooks.csv" );
+  timeStampedEcho ( "[$sourceURL] trimmed in products\n" );
+  
+  storeCVS ( $prodInfoArray, $cvsFName );
+  timeStampedEcho ( "[$sourceURL] saved in [$cvsFName]\n" );
 }
 
-storeCVS ( $prodInfoArray, "tmp/pleer_elbooks.csv" );
+loadPleerRuPrice ( 'http://pleer.ru/eletr-knigi.html', "./tmp/pleer.ru/eletr-knigi.html", "tmp/pleer_elbooks.csv" );
+loadPleerRuPrice ( 'http://www.pleer.ru/kpk-i-kommunikatory~all.html', "./tmp/pleer.ru/kpk-komm.html", "tmp/pleer_kpk_tel.csv" );
+loadPleerRuPrice ( 'http://pleer.ru/mediapleery.html', "./tmp/pleer.ru/mediapl.html", "tmp/pleer_mediapl.csv" );
+
+timeStampedEcho ( "Done!\n" );
+
+
