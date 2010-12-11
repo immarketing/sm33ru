@@ -394,7 +394,18 @@ class SimpleCRUD {
       //$query->setSpreadsheetKey ( $this->currKey );
       $query->setSpreadsheetKey ( $this->workDocs [$theKey] [CURRKEY] );
       
-      $feed = $this->gdClient->getWorksheetFeed ( $query );
+      for($i = 1; $i <= 10; $i ++) {
+        try {
+          $feed = $this->gdClient->getWorksheetFeed ( $query );
+          break;
+        } catch ( Exception $e ) {
+          if ($i == 10) {
+            throw $e;
+          }
+          continue;
+        }
+      }
+      
       foreach ( $feed->entries as $entry ) {
         if (strtolower ( $entry->title->text ) === "options") {
           //echo "\nopt\n";
@@ -723,6 +734,15 @@ EOT_EOT;
     }
         */
     $result .= '</tbody></table>';
+    
+    $prodNameVK = $curProd ['Наименование'];
+    $prodIDVK = $curProd [SM_INTERNAL_RECALC_ID];
+    $prodURLVK = 'http://www.supermarket33.ru/index.php?page=shop.product_details&product_id=' . ($prodIDVK) . '&option=com_virtuemart';
+    $fullPURL = $curProd [SM_INTERNAL_FULLPICTURL];
+    $prodImgURLVK = "http://www.supermarket33.ru/components/com_virtuemart/shop_image/product/$fullPURL";
+    
+    $result .= '<script type="text/javascript">' . "if (showVKontakteButton) showVKontakteButton('$prodURLVK','$prodNameVK','Купи [$prodNameVK] на <br/> -=SuperMarket33.ru=-','$prodImgURLVK');" . 'if (showSocialSharing) showSocialSharing(1);' . '</script>';
+    
     return $result;
   }
   
@@ -740,7 +760,18 @@ EOT_EOT;
     $query = new Zend_Gdata_Spreadsheets_ListQuery ();
     $query->setSpreadsheetKey ( $v [CURRKEY] );
     $query->setWorksheetId ( $v [CURWKSHT] );
-    $this->listFeed = $this->gdClient->getListFeed ( $query );
+    
+    for($i = 1; $i <= 10; $i ++) {
+      try {
+        $this->listFeed = $this->gdClient->getListFeed ( $query );
+        break;
+      } catch ( Exception $e ) {
+        if ($i == 10) {
+          throw $e;
+        }
+        continue;
+      }
+    }
     
     $feed = $this->listFeed;
     $resultData = null;
@@ -780,7 +811,18 @@ EOT_EOT;
     $query = new Zend_Gdata_Spreadsheets_ListQuery ();
     $query->setSpreadsheetKey ( $this->workDocs [$theKey] [CURRKEY] );
     $query->setWorksheetId ( $this->workDocs [$theKey] [CURWKSHTIDDAT] );
-    $this->listFeed = $this->gdClient->getListFeed ( $query );
+    
+    for($i = 1; $i <= 10; $i ++) {
+      try {
+        $this->listFeed = $this->gdClient->getListFeed ( $query );
+        break;
+      } catch ( Exception $e ) {
+        if ($i == 10) {
+          throw $e;
+        }
+        continue;
+      }
+    }
     $i = 0;
     
     $feed = $this->listFeed;

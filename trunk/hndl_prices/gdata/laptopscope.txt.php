@@ -270,6 +270,7 @@ foreach ( $fullNoteInfo as $k => $v ) {
 
 $csvProps = @fopen ( "tmp/laptopscope_props.csv", "w" );
 $locArr = array ();
+$usedArtcls= array ();
 
 foreach ( $hdrArrs as $k => $v ) {
   $locArr [] = $k;
@@ -277,6 +278,12 @@ foreach ( $hdrArrs as $k => $v ) {
 fputcsv ( $csvProps, $locArr );
 
 foreach ( $allPropArray as $k => $v ) {
+  $cAtr = $v['Артикул'];
+  if ($usedArtcls[$cAtr]) {
+    continue;
+  } else {
+    $usedArtcls[$cAtr]=1;
+  }
   $locArr = array ();
   foreach ( $hdrArrs as $k1 => $v1 ) {
     $locArr [] = $v [$k1];
