@@ -257,7 +257,9 @@ class GetAvailableDocuments {
 
       "Мясорубки" === $entry->title->text || 
 
-      "Ноутбуки laptopscope" === $entry->title->text || 
+      "Ноутбуки laptopscope" === $entry->title->text ||
+
+      "pleer.ru_телефоны" === $entry->title->text ||
 
       false) {
         //
