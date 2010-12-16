@@ -287,6 +287,8 @@ class GetAvailableDocuments {
 
       "pleer.ru_телефоны" === $entry->title->text || 
 
+      "pleer.ru_медиаплееры" === $entry->title->text || 
+      
       false) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
