@@ -101,7 +101,7 @@ function storeCVS($arr, $fName) {
   fclose ( $csvProps );
 }
 
-function loadPleerRuPrice($sourceURL, $tmpFName, $cvsFName) {
+function loadPleerRuPrice($sourceURL, $tmpFName, $cvsFName, &$fullData) {
   //if (! loadStartPage ( 'http://pleer.ru/eletr-knigi.html', "./tmp/pleer.ru/eletr-knigi.html" )) {
   timeStampedEcho ( "Handling [$sourceURL]\n" );
   if (! loadStartPage ( $sourceURL, $tmpFName )) {
@@ -126,6 +126,9 @@ function loadPleerRuPrice($sourceURL, $tmpFName, $cvsFName) {
   $prodInfoArray = array ();
   $hdr = array ('name', 'description', 'pleer_ru_code', 'pleer_ru_price', 'pleer_ru_url' );
   $prodInfoArray [] = $hdr;
+  if (!count($fullData)){
+    $fullData[]= $hdr;
+  }
   foreach ( $rws as $k => $v ) {
     //echo $k . "\t====\t" . $v . "\n";
     $rw = splitProductInfo ( $v );
@@ -133,6 +136,7 @@ function loadPleerRuPrice($sourceURL, $tmpFName, $cvsFName) {
       continue;
     }
     $prodInfoArray [] = $rw;
+    $fullData[]= $rw;
   }
   
   //storeCVS ( $prodInfoArray, "tmp/pleer_elbooks.csv" );
@@ -142,13 +146,17 @@ function loadPleerRuPrice($sourceURL, $tmpFName, $cvsFName) {
   timeStampedEcho ( "[$sourceURL] saved in [$cvsFName]\n" );
 }
 
-loadPleerRuPrice ( 'http://pleer.ru/eletr-knigi.html', "./tmp/pleer.ru/eletr-knigi.html", "tmp/pleer_elbooks.csv" );
-loadPleerRuPrice ( 'http://www.pleer.ru/kpk-i-kommunikatory~all.html', "./tmp/pleer.ru/kpk-komm.html", "tmp/pleer_kpk_tel.csv" );
-loadPleerRuPrice ( 'http://pleer.ru/mediapleery.html', "./tmp/pleer.ru/mediapl.html", "tmp/pleer_mediapl.csv" );
-loadPleerRuPrice ( 'http://pleer.ru/gps-avtonavigaciya.html', "./tmp/pleer.ru/gps-navi.html", "tmp/pleer_gpsnavi.csv" );
-loadPleerRuPrice ( 'http://pleer.ru/vebkamery.html', "./tmp/pleer.ru/webcams.html", "tmp/pleer_webcams.csv" );
-loadPleerRuPrice ( 'http://pleer.ru/1gb-i-bolee.html', "./tmp/pleer.ru/mp3pleer.html", "tmp/pleer_mp3pleer.csv" );
-loadPleerRuPrice ( 'http://pleer.ru/cifrovye-fotoapparaty~all.html', "./tmp/pleer.ru/photoapp.html", "tmp/pleer_photoapp.csv" );
+$fullPrice=array();
+
+loadPleerRuPrice ( 'http://pleer.ru/eletr-knigi.html', "./tmp/pleer.ru/eletr-knigi.html", "tmp/pleer_elbooks.csv" ,$fullPrice);
+loadPleerRuPrice ( 'http://www.pleer.ru/kpk-i-kommunikatory~all.html', "./tmp/pleer.ru/kpk-komm.html", "tmp/pleer_kpk_tel.csv",$fullPrice );
+loadPleerRuPrice ( 'http://pleer.ru/mediapleery.html', "./tmp/pleer.ru/mediapl.html", "tmp/pleer_mediapl.csv",$fullPrice );
+loadPleerRuPrice ( 'http://pleer.ru/gps-avtonavigaciya.html', "./tmp/pleer.ru/gps-navi.html", "tmp/pleer_gpsnavi.csv",$fullPrice );
+loadPleerRuPrice ( 'http://pleer.ru/vebkamery.html', "./tmp/pleer.ru/webcams.html", "tmp/pleer_webcams.csv",$fullPrice );
+loadPleerRuPrice ( 'http://pleer.ru/1gb-i-bolee.html', "./tmp/pleer.ru/mp3pleer.html", "tmp/pleer_mp3pleer.csv",$fullPrice );
+loadPleerRuPrice ( 'http://pleer.ru/cifrovye-fotoapparaty~all.html', "./tmp/pleer.ru/photoapp.html", "tmp/pleer_photoapp.csv",$fullPrice );
+
+storeCVS($fullPrice, "tmp/pleer_all.csv");
 
 timeStampedEcho ( "Done!\n" );
 
