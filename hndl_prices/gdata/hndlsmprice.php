@@ -208,34 +208,8 @@ class GetAvailableDocuments {
   
   public function getDocsArray() {
     $prodNames = array ("СВЧ печи" => "свч", "Утюги" => "утюг", "Обогреватели" => "", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч" );
-    $prodKeyWords = array (
-    "СВЧ печи" => "свч, микроволновка, микроволновки", 
-    "Утюги" => "утюг, утюги", 
-    "Обогреватели" => "обогреватель, масляный обогреватель", 
-    "Видеокамеры" => "видеокамера, видеокамеры", 
-    "Хлебопечи" => "Хлебопечи, хлебопечь", 
-    "Кофеварки" => "Кофеварки, Кофеварка", 
-    "Фотоаппараты" => "Фотоаппарат,Фотоаппараты", 
-    "Домашние кинотеатры" => "Домашние кинотеатры, Домашний кинотеатр, DVD, blu-ray", 
-    "Музыкальные центры" => "Музыкальные центры, Музыкальный центр", 
-    "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", 
-    "DVD" => "DVD, blu-ray", 
-    "пылесосы" => "пылесосы, пылесос", 
-    "Фотообъективы" => "Фотообъективы,Фотообъектив", 
-    "Блендеры" => "Блендеры, Блендер", 
-    "Бритвы" => "Бритвы, Бритва", 
-    "Фены" => "Фены, Фен", 
-    "Мясорубки" => "Мясорубки, Мясорубка", 
-    "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки",
-    "pleer.ru_телефоны" => "Телефон, телефоны, коммуникаторы, коммуникатор, смартфон, смартфоны"
-    );
-    $prodWriteAdv = array (
-    "СВЧ печи" => "свч, микроволновка, микроволновки", 
-    "Хлебопечи" => "Хлебопечи, хлебопечь", 
-    "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", 
-    "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки", 
-    "pleer.ru_телефоны" => "Телефон, телефоны, коммуникаторы, коммуникатор, смартфон, смартфоны"
-    );
+    $prodKeyWords = array ("СВЧ печи" => "свч, микроволновка, микроволновки", "Утюги" => "утюг, утюги", "Обогреватели" => "обогреватель, масляный обогреватель", "Видеокамеры" => "видеокамера, видеокамеры", "Хлебопечи" => "Хлебопечи, хлебопечь", "Кофеварки" => "Кофеварки, Кофеварка", "Фотоаппараты" => "Фотоаппарат,Фотоаппараты", "Домашние кинотеатры" => "Домашние кинотеатры, Домашний кинотеатр, DVD, blu-ray", "Музыкальные центры" => "Музыкальные центры, Музыкальный центр", "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", "DVD" => "DVD, blu-ray", "пылесосы" => "пылесосы, пылесос", "Фотообъективы" => "Фотообъективы,Фотообъектив", "Блендеры" => "Блендеры, Блендер", "Бритвы" => "Бритвы, Бритва", "Фены" => "Фены, Фен", "Мясорубки" => "Мясорубки, Мясорубка", "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки", "pleer.ru_телефоны" => "Телефон, телефоны, коммуникаторы, коммуникатор, смартфон, смартфоны" );
+    $prodWriteAdv = array ("СВЧ печи" => "свч, микроволновка, микроволновки", "Хлебопечи" => "Хлебопечи, хлебопечь", "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки", "pleer.ru_телефоны" => "Телефон, телефоны, коммуникаторы, коммуникатор, смартфон, смартфоны" );
     $res = array ();
     
     $feed = $this->gdClient->getSpreadsheetFeed ();
@@ -243,7 +217,9 @@ class GetAvailableDocuments {
     //$i = 0;
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
-      if ("СВЧ печи" === $entry->title->text || //
+      if (
+
+      "СВЧ печи" === $entry->title->text || //
 
 
       "Утюги" === $entry->title->text || //
@@ -288,7 +264,9 @@ class GetAvailableDocuments {
       "pleer.ru_телефоны" === $entry->title->text || 
 
       "pleer.ru_медиаплееры" === $entry->title->text || 
-      
+
+      "pleer.ru_эл_книги" === $entry->title->text || 
+
       false) {
         //
         $res [$entry->title->text] [URL] = $entry->id->text;
@@ -868,6 +846,7 @@ EOT_EOT;
           $curDat = $cst [$datIndexByHdr ["Код"] - 1]->getText ();
         } catch ( Exception $e ) {
           $curDat = null;
+          continue;
         }
         try {
           $curMrkYaRu = $cst [$datIndexByHdr ["market.yandex.ru"] - 1]->getText ();
@@ -1468,7 +1447,8 @@ EOT_EOT;
    *
    * @return void
    */
-  public function run() {
+  public function run($isLoadImages = 1) {
+    echo '$isLoadImages==' . "$isLoadImages\n";
     $docList = new GetAvailableDocuments ( $this->email, $this->password );
     
     $docs = $docList->getDocsArray ();
@@ -1508,7 +1488,9 @@ EOT_EOT;
     }
     
     //print ' | loadPImagesFromWeb' . "\n";
-    $this->loadPImagesFromWeb ();
+    if ($isLoadImages) {
+      $this->loadPImagesFromWeb ();
+    }
     
     $this->createAndWriteSQLs ();
     
@@ -1565,6 +1547,12 @@ foreach ( $argv as $argument ) {
     $sample->run ();
     die ();
   }
+  if ($argParts [0] == '--makesqlnoimages') {
+    echo "\nmakesqlnoimages\n";
+    $sample = new SimpleCRUD ( $email, $pass );
+    $sample->run ( 0 );
+    die ();
+  }
   if ($argParts [0] == '--listdocs') {
     $sample = new SimpleCRUD ( $email, $pass );
     $sample->runListDocs ();
@@ -1581,10 +1569,11 @@ foreach ( $argv as $argument ) {
 }
 
 echo "Use commands
-\t--updatemartins=_file_name_  \t to update martins.ru price
-\t--makesql                    \t to create SQL file
-\t--listdocs                   \t to list available docs
-\t--updatefcenter=_file_name_  \t to update fcenter.ru price
+\t--updatemartins=_file_name_  	\t to update martins.ru price
+\t--makesql                    	\t to create SQL file
+\t--makesqlnoimages				\t to create SQL file without images
+\t--listdocs                	\t to list available docs
+\t--updatefcenter=_file_name_  	\t to update fcenter.ru price
 ";
 
 /*
