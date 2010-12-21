@@ -136,6 +136,10 @@ function loadPleerRuPrice($sourceURL, $tmpFName, $cvsFName, &$fullData) {
       continue;
     }
     $prodInfoArray [] = $rw;
+    if (strlen($rw[1]) > 100) {
+      $rw[1] = substr ($rw[1],0,100)."...";
+    }
+     
     $fullData[]= $rw;
   }
   
