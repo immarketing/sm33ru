@@ -8,11 +8,14 @@ class MartinsRuPriceUpdater {
     $this->email = $email;
     $this->password = $password;
     
-    $this->gConnector = new sm33_SM33GData ( $email, $password );
-    $this->mrtnsPrice = $this->gConnector->getSpreadsheetByName ( "martins.ru" );
-    $rr = $this->mrtnsPrice->getRowAndColumnCount ( "Sheet 1" );
     $this->priceFile = $priceFile;
     $this->highestXLSRow = 0;
+  }
+  
+  public function initialize() {
+    $this->gConnector = new sm33_SM33GData ( $this->email, $this->password );
+    $this->mrtnsPrice = $this->gConnector->getSpreadsheetByName ( "martins.ru" );
+    $rr = $this->mrtnsPrice->getRowAndColumnCount ( "Sheet 1" );
   }
   
   public function try2upload($fName, $realName) {
@@ -37,6 +40,7 @@ class MartinsRuPriceUpdater {
       $code = 0 + $this->priceArray [$row] [1];
       $mdl = $this->priceArray [$row] [2];
       $prc = 0 + $this->priceArray [$row] [4];
+      $tp = $this->priceArray [$row] [5];
       if ($code > 0) {
         //timeStampedEcho ( '$code==' . "$code" . "|\t" . '$mdl==' . "$mdl" . "|\t" . '$prc==' . "$prc\n" );
         if ($this->dataGData2Add [$code]) {
@@ -69,6 +73,7 @@ class MartinsRuPriceUpdater {
           $this->dataGData [$code] [PRICE] = $prc;
           $this->dataGData [$code] [ISPUBLISHED] = '2';
           $this->dataGData [$code] [UPDATETIME] = date ( 'Ymd H:i:s' );
+          $this->dataGData [$code] [TYPE] = $tp;
           
           $this->dataGData2Add [$code] = null;
         
@@ -153,12 +158,12 @@ class MartinsRuPriceUpdater {
   public function saveCSVFile($fName) {
     $fp = fopen ( $fName, 'w' );
     if ($fp) {
-      $vls = array ('code', 'model', 'description', 'price', 'ispublished', 'updatetime' );
+      $vls = array ('code', 'model', 'description', 'price', 'ispublished', 'updatetime', 'type' );
       fputcsv ( $fp, $vls );
       
       foreach ( $this->dataGData as $cd => $ar ) {
         //fputcsv ( $fp, $fields );
-        $vls = array ($this->dataGData [$cd] [CODE], $this->dataGData [$cd] [MODEL], $this->dataGData [$cd] [DESCRIPTION], $this->dataGData [$cd] [PRICE], $this->dataGData [$cd] [ISPUBLISHED], $this->dataGData [$cd] [UPDATETIME] );
+        $vls = array ($this->dataGData [$cd] [CODE], $this->dataGData [$cd] [MODEL], $this->dataGData [$cd] [DESCRIPTION], $this->dataGData [$cd] [PRICE], $this->dataGData [$cd] [ISPUBLISHED], $this->dataGData [$cd] [UPDATETIME], $this->dataGData [$cd] [TYPE] );
         fputcsv ( $fp, $vls );
       
       }
@@ -177,7 +182,7 @@ class MartinsRuPriceUpdater {
         $this->dataFeed = $this->gConnector->getGDClient ()->getListFeed ( $query );
         break;
       } catch ( Exception $e ) {
-        if ($i==10){
+        if ($i == 10) {
           throw $e;
         }
         continue;
@@ -211,7 +216,7 @@ class MartinsRuPriceUpdater {
 
     $this->highestXLSRow = $highestRow;
     
-    for($row = 15; $row <= $highestRow; ++ $row) {
+    for($row = 14; $row <= $highestRow; ++ $row) {
       $cc = 0 + $objWorksheet->getCellByColumnAndRow ( 1, $row )->getValue ();
       $this->dataGData2Add [$cc] = $cc;
       $this->priceArray [$row] [0] = $objWorksheet->getCellByColumnAndRow ( 0, $row )->getValue ();
@@ -219,6 +224,13 @@ class MartinsRuPriceUpdater {
       $this->priceArray [$row] [2] = $objWorksheet->getCellByColumnAndRow ( 2, $row )->getValue ();
       $this->priceArray [$row] [3] = $objWorksheet->getCellByColumnAndRow ( 3, $row )->getValue ();
       $this->priceArray [$row] [4] = $objWorksheet->getCellByColumnAndRow ( 4, $row )->getValue ();
+      
+      $knd = $this->priceArray [$row] [2];
+      
+      if (preg_match ( '/-/', substr ($knd,0,4) ) && $this->priceArray [$row] [1] == '') {
+        $this->currKnd = $knd;
+      }
+      $this->priceArray [$row] [5] = $this->currKnd;
     }
   }
 }
@@ -230,6 +242,7 @@ function timeStampedEcho($outSt) {
 
 function updateMartinsFromFile($priceFile, $email, $password) {
   timeStampedEcho ( "martins.ru updater started\n" );
+  
   $mtnupdtr = new MartinsRuPriceUpdater ( $priceFile, $email, $password );
   timeStampedEcho ( "martins.ru updater created\n" );
   
@@ -238,6 +251,10 @@ function updateMartinsFromFile($priceFile, $email, $password) {
   //timeStampedEcho ( "martins.ru cols updated\n" );
   $mtnupdtr->loadXLSInMem ();
   timeStampedEcho ( "XLS loaded\n" );
+  //die ();
+  $mtnupdtr->initialize ();
+  timeStampedEcho ( "martins.ru updater initialized\n" );
+  
   $mtnupdtr->loadGDocInMem ();
   timeStampedEcho ( "GDOC loaded\n" );
   $mtnupdtr->try2update ();
