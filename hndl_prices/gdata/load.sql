@@ -11,6 +11,8 @@ delete from jos_vm_product_category_xref ;
 delete from jos_vm_category ;
 delete from jos_vm_product ;
 delete from jos_vm_product_price ;
+delete from jos_vm_algo_search_history;
+delete from jos_vm_algo_search_results;
 quit
 
 mysql --default-character-set=Utf8 -u suupermarkt -pMarKt3687Jhhdj suupermarkt <cats.sql
@@ -25,4 +27,3 @@ select product_id,product_thumb_image, product_full_image from jos_vm_product;
 update jos_vm_product set product_thumb_image=concat(product_id,'.jpg'), product_full_image=concat(product_id,'.jpg');
 
 update jos_vm_product set product_thumb_image=product_full_image;
-
