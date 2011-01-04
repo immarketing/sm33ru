@@ -1526,7 +1526,7 @@ function getInput($text) {
 $email = "sm33.bot@gmail.com";
 $pass = "Rty6$52hgsgt";
 
-$argv[]='--updatemartins=..\martins\martins.xls';
+//$argv[]='--updatemartins=..\martins\martins.xls';
 //$argv [] = '--makesql';
 //$argv[]='--updatefcenter=..\fcenter\price.html';
 
@@ -1593,4 +1593,3 @@ if (($email == null) || ($pass == null)) {
   $pass = getInput ( "Please enter your password [example: mypassword]" );
 }
 */
-
