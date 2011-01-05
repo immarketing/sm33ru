@@ -7,9 +7,13 @@ function onOpen() {
 		name : "Скопировать краткий прайс в выделенные таблицы",
 		functionName : "copyPriceSheetToDocs"
 	}, {
+		name : "Обновить цены в выделенных прайсах",
+		functionName : "renewPricesInDocs"
+	}, {
 		name : "Создать список всех таблиц на новом листе",
 		functionName : "fillNewSheetWithAllDocs"
 	} ];
+
 	Logger.log(menuEntries);
 	ss.addMenu("Для SuperMarket33.ru", menuEntries);
 }
@@ -72,7 +76,149 @@ function copyPriceSheetToDocs() {
 		newPrice.setName("short.price.plrru");
 		ssTo.setActiveSheet(newPrice);
 		ssTo.moveActiveSheet(ssTo.getSheets().length);
+		Utilities.formatDate(new Date(), "GMT", "yyyy-MM-dd'T'HH:mm:ss'Z'");
+		var cll = rng.getCell(i + 1, 1);
+		// Logger.log(cll);
+		cll.setComment(getStampedString("Прайс скопирован "));
 	}
+}
+
+function renewPricesInDocs() {
+	var ss = SpreadsheetApp.getActiveSpreadsheet();
+	// var shortPrice = ss.getSheetByName("short.price");
+	var as = ss.getActiveSheet();
+	var rng = as.getActiveSelection();
+	var vls = rng.getValues();
+
+	for ( var i = 0; i <= vls.length - 1; i++) {
+		var sprID = vls[i][0];
+		var ssTo = SpreadsheetApp.openById(sprID);
+		if (!ssTo) {
+			var cll = rng.getCell(i + 1, 1);
+			cll.setComment(getStampedString("Проблема. Не найден прайс?"));
+			continue;
+		}
+		var docPriceShort = ssTo.getSheetByName("short.price.plrru");
+		var docData = ssTo.getSheetByName("Data");
+		if (!ssTo) {
+			var cll = rng.getCell(i + 1, 1);
+			cll
+					.setComment(getStampedString("Проблема. В прайсе не найдены страницы <Data> или <short.price.plrru>?"));
+			continue;
+		}
+
+		if (renewPricesFromLoadedPleerRu(docData, docPriceShort)) {
+			var cll = rng.getCell(i + 1, 1);
+			cll
+					.setComment(getStampedString("Цены в прайс-листе обновлены по загруженным"));
+		} else {
+			var cll = rng.getCell(i + 1, 1);
+			cll
+					.setComment(getStampedString("Цены в прайс-листе НЕ обновлены. Обновление уже было?"));
+		}
+	}
+}
+
+function renewPricesFromLoadedPleerRu(dataSheet, priceSheet) {
+	var sheetData = dataSheet;
+	var sheetPrice = priceSheet;
+
+	var titles = sheetData.getRange(1, 1, 1, sheetData.getLastColumn())
+			.getValues();
+
+	var codeIndex = titles[0].indexOf('pleer_ru_code');
+	var priceIndex = titles[0].indexOf('Цена поставщика');
+	var pblcIndex = titles[0].indexOf('sm.публиковать');
+
+	// Logger.log(codeIndex);
+	// Logger.log(pblcIndex );
+	var codeArr = sheetData.getRange(1, codeIndex + 1, sheetData.getLastRow(),
+			1).getValues();
+	// Logger.log(codeArr);
+	var priceArr = sheetData.getRange(1, priceIndex + 1,
+			sheetData.getLastRow(), 1).getValues();
+	// Logger.log(priceArr);
+	var pblcArr = sheetData.getRange(1, pblcIndex + 1, sheetData.getLastRow(),
+			1).getValues();
+
+	var titles2 = sheetPrice.getRange(1, 1, 1, sheetPrice.getLastColumn())
+			.getValues();
+	var codeIndex2 = titles2[0].indexOf('pleer_ru_code');
+	var priceIndex2 = titles2[0].indexOf('pleer_ru_price');
+
+	var codeArr2 = sheetPrice.getRange(1, codeIndex2 + 1,
+			sheetPrice.getLastRow(), 1).getValues();
+	var priceArr2 = sheetPrice.getRange(1, priceIndex2 + 1,
+			sheetPrice.getLastRow(), 1).getValues();
+
+	// var refPriceArr = sheetPrice.getRange(1, 1, sheetPrice.getLastRow(),
+	// 3).getValues();
+	// Logger.log(refPriceArr);
+	var refPriceArrCode = [];
+	var refPriceArrPrice = [];
+	var refPriceArrPblc = [];
+
+	for ( var i = 1; i <= codeArr2.length - 1; i++) {
+		refPriceArrCode[i] = codeArr2[i][0].toString();
+		refPriceArrPrice[i] = priceArr2[i][0];
+		if (priceArr2[i][0] < 0){
+			return 0;
+		}
+		refPriceArrPblc[i] = 1;
+	}
+	// Logger.log(refPriceArrCode);
+	// Logger.log(refPriceArrCode[1]);
+	// var asdf;
+	// Logger.log(asdf=refPriceArrCode.indexOf(7296));
+	// Logger.log(refPriceArrPblc );
+
+	for ( var i = 1; i <= codeArr.length - 1; i++) {
+		var cInd = -1;
+		pblcArr[i][0] = 0;
+		var cd2srch = 0 + parseInt("" + codeArr[i]);
+		if (cd2srch == 0) {
+			continue;
+		}
+		cd2srch = "" + cd2srch;
+		cInd = refPriceArrCode.indexOf(cd2srch);
+		Logger.log('codeArr[i]==' + codeArr[i] + '|cd2srch==' + cd2srch
+				+ "|cInd==" + cInd);
+		if (cInd >= 0) {
+			priceArr[i][0] = refPriceArrPrice[cInd];
+			if (priceArr[i][0] < 0){
+				return 0;
+			}
+			pblcArr[i][0] = 1;
+			refPriceArrPblc[cInd] = -1;
+		}
+	}
+
+	for ( var i = 1; i <= codeArr2.length - 1; i++) {
+		// refPriceArrCode[i] = codeArr2[i][0].toString();
+		// refPriceArrPrice[i] = priceArr2[i][1];
+		if (refPriceArrPblc[i] < 0) {
+			priceArr2[i][0] = -priceArr2[i][0];
+		}
+		// refPriceArrPblc[i] = 1;
+	}
+
+	//Logger.log(priceArr);
+	sheetData.getRange(1, codeIndex + 1, codeArr.length, 1).setValues(codeArr);
+	sheetData.getRange(1, priceIndex + 1, priceArr.length, 1).setValues(
+			priceArr);
+	sheetData.getRange(1, pblcIndex + 1, pblcArr.length, 1).setValues(pblcArr);
+
+	sheetPrice.getRange(1, priceIndex2 + 1, sheetPrice.getLastRow(), 1)
+			.setValues(priceArr2);
+	return 1;
+}
+
+function getStampedString(aStr) {
+	return "["
+			+ Utilities
+					.formatDate(new Date(), "GMT+3", "yyyy/MM/dd'|'HH:mm:ss")
+			+ "] " + aStr;
+
 }
 
 function createShortPrice() {
