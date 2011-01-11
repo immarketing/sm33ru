@@ -73,7 +73,7 @@ function getProdPages($ldd) {
   return $rws [1];
 }
 
-function loadRazdel($razdelURL, $razdelFName) {
+function loadRazdel($razdelURL, $razdelFName, $loadOneLevel=0) {
   // http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=17&grupp_kod=83652&kategory=57&grupp=LCD%20-%D2%C5%CB%C5%C2%C8%C7%CE%D0%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
   // "tmp/optvideo/lcd.htm"
   timeStampedEcho ( "Handling <$razdelFName>\n" );
@@ -88,6 +88,11 @@ function loadRazdel($razdelURL, $razdelFName) {
   parse_str ( $urlSQuery, $parsedSQuery );
   
   loadStartPage ( $startURL, "$razdelFName.htm" );
+  
+  if ($loadOneLevel){
+    // $loadOneLevel
+    return array("$razdelFName.htm");
+  }
   $loaded = loadFile ( "$razdelFName.htm" );
   $loaded = trimUnusedChars ( $loaded );
   
@@ -158,18 +163,22 @@ function parseOneFile($fName, $tp) {
   /*
   preg_match_all ( '/<tr[^>]*?class=\"product_row\"[^>]*?>(.*?)<\/tr>/ims', $ldd, $rws );
   */
-  preg_match_all ( '/<a href="([^"]*?)"/ims', $loaded, $imagesRWS );
+  //preg_match_all ( '/<a href="([^"]*?)"/ims', $loaded, $imagesRWS );
+  // http://optvideo.com/new_design/new_kat/view.php?kod=
+  preg_match_all ( '/view\.php\?kod\=([^"]*?)"/ims', $loaded, $imagesRWS );
   //print_r ( $imagesRWS );
   
 
   foreach ( $imagesRWS [1] as $k => $v ) {
     $readyObj = null;
     $codeSt = $v;
+    /*
     $posF = strrpos ( $codeSt, '.' );
     $codeSt = substr ( $codeSt, 0, $posF );
     
     $posF = strrpos ( $codeSt, '/' );
     $codeSt = substr ( $codeSt, $posF + 1 );
+    */
     $codesRWS [] = $codeSt;
     
     $readyObj ['code'] = $codeSt;
@@ -326,6 +335,134 @@ $allFNames [] = $nouts;
 $nout_vls = parseFArray ( $nouts, 'nouts' );
 $all_vls=array_merge ( $all_vls, $nout_vls );
 storeCVS($nout_vls,$objFields,$csvHeader,'./tmp/optvideo_nouts.csv');
+
+// кабели
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&grupp_kod=913359&otobr=1&count_fl=16&kategory=78261&grupp=%CA%C0%C1%C5%CB%C8
+$kabels = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&grupp_kod=913359&otobr=1&count_fl=16&kategory=78261&grupp=%CA%C0%C1%C5%CB%C8', "tmp/optvideo/kabels", 1 );
+$allFNames [] = $kabels;
+$kabels_vls = parseFArray ( $kabels, 'kabels' );
+$all_vls=array_merge ( $all_vls, $kabels_vls );
+storeCVS($kabels_vls,$objFields,$csvHeader,'./tmp/optvideo_kabels.csv');
+
+// Картриджи
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&grupp_kod=95105&otobr=1&count_fl=26&kategory=90898&grupp=%CA%CE%CC%CF%DC%DE%D2%C5%D0%CD%C0%DF%20%CF%C5%D0%C8%D4%C5%D0%C8%DF
+$kartrij = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&grupp_kod=95105&otobr=1&count_fl=26&kategory=90898&grupp=%CA%CE%CC%CF%DC%DE%D2%C5%D0%CD%C0%DF%20%CF%C5%D0%C8%D4%C5%D0%C8%DF', "tmp/optvideo/kartridg", 1 );
+$allFNames [] = $kartrij;
+$kartrij_vls = parseFArray ( $kartrij, 'kartridg' );
+$all_vls=array_merge ( $all_vls,$kartrij_vls );
+storeCVS($kartrij_vls ,$objFields,$csvHeader,'./tmp/optvideo_kartridg.csv');
+
+// посуда стеклянная - наборы столовые
+//http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=37&grupp_kod=913380&kategory=125246&grupp=%CF%CE%D1%D3%C4%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$steklo_nabor_stolov = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=37&grupp_kod=913380&kategory=125246&grupp=%CF%CE%D1%D3%C4%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/steklo_nabor_stolov", 1 );
+$allFNames [] = $steklo_nabor_stolov;
+$steklo_nabor_stolov_vls = parseFArray ( $steklo_nabor_stolov, 'steklo_nabor_stol' );
+$all_vls=array_merge ( $all_vls,$steklo_nabor_stolov_vls );
+storeCVS($steklo_nabor_stolov_vls,$objFields,$csvHeader,'./tmp/optvideo_steklo_nabor_stolov.csv');
+
+// кухонные весы
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=21&grupp_kod=123777&kategory=123776&grupp=%CA%D3%D5%CE%CD%CD%DB%C5%20%CF%D0%C8%CD%C0%C4%CB%C5%C6%CD%CE%D1%D2%C8&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$vesy_kuhnya = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=21&grupp_kod=123777&kategory=123776&grupp=%CA%D3%D5%CE%CD%CD%DB%C5%20%CF%D0%C8%CD%C0%C4%CB%C5%C6%CD%CE%D1%D2%C8&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/vesy_kuhnya", 1 );
+$allFNames [] = $vesy_kuhnya ;
+$vesy_kuhnya_vls = parseFArray ( $vesy_kuhnya, 'vesy_kuhnya' );
+$all_vls=array_merge ( $all_vls,$vesy_kuhnya_vls );
+storeCVS($vesy_kuhnya_vls ,$objFields,$csvHeader,'./tmp/optvideo_vesy_kuhnya.csv');
+
+// бинокли
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=26&grupp_kod=103118&kategory=114729&grupp=%D2%CE%C2%C0%D0%DB%20%C4%CB%DF%20%CE%D2%C4%DB%D5%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$binokli = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=26&grupp_kod=103118&kategory=114729&grupp=%D2%CE%C2%C0%D0%DB%20%C4%CB%DF%20%CE%D2%C4%DB%D5%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/binokli", 1 );
+$allFNames [] = $binokli ;
+$binokli_vls = parseFArray ( $binokli, 'binokli' );
+$all_vls=array_merge ( $all_vls,$binokli_vls );
+storeCVS($binokli_vls ,$objFields,$csvHeader,'./tmp/optvideo_binokli.csv');
+
+// тепловые пушки
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=15&grupp_kod=86917&kategory=123786&grupp=%CE%D2%CE%CF%CB%C5%CD%C8%C5%20%C8%20%C2%CE%C4%CE%D1%CD%C0%C1%C6%C5%CD%C8%C5&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$tepl_pushk = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=15&grupp_kod=86917&kategory=123786&grupp=%CE%D2%CE%CF%CB%C5%CD%C8%C5%20%C8%20%C2%CE%C4%CE%D1%CD%C0%C1%C6%C5%CD%C8%C5&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/tepl_pushki", 1 );
+$allFNames [] = $tepl_pushk ;
+$tepl_pushk_vls = parseFArray ( $tepl_pushk, 'tepl_pushk' );
+$all_vls=array_merge ( $all_vls,$tepl_pushk_vls );
+storeCVS($tepl_pushk_vls ,$objFields,$csvHeader,'./tmp/optvideo_tepl_pushki.csv');
+
+// тепловентиляторы
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=20&grupp_kod=9625&kategory=123786&grupp=%CE%D2%CE%CF%CB%C5%CD%C8%C5%20%C8%20%C2%CE%C4%CE%D1%CD%C0%C1%C6%C5%CD%C8%C5&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$teplovent = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=20&grupp_kod=9625&kategory=123786&grupp=%CE%D2%CE%CF%CB%C5%CD%C8%C5%20%C8%20%C2%CE%C4%CE%D1%CD%C0%C1%C6%C5%CD%C8%C5&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/teploventilyatory", 1 );
+$allFNames [] = $teplovent ;
+$teplovent_vls = parseFArray ( $teplovent, 'teploventilyatory' );
+$all_vls=array_merge ( $all_vls,$teplovent_vls );
+storeCVS($teplovent_vls ,$objFields,$csvHeader,'./tmp/optvideo_teploventilyatory.csv');
+
+$magnitoly_all = array();
+// магнитолы CD_DVD
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=102&grupp_kod=71409&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$magnitoly_cd_dvd = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=102&grupp_kod=71409&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/magnitoly_cd_dvd", 1 );
+$allFNames [] = $magnitoly_cd_dvd ;
+$magnitoly_cd_dvd_vls = parseFArray ( $magnitoly_cd_dvd, 'magn_cd_dvd' );
+$all_vls=array_merge ( $all_vls,$magnitoly_cd_dvd_vls );
+$magnitoly_all =array_merge ( $magnitoly_all ,$magnitoly_cd_dvd_vls );
+storeCVS($magnitoly_cd_dvd_vls,$objFields,$csvHeader,'./tmp/optvideo_magnitoly_cd_dvd.csv');
+
+// магнитолы cd_mp3 
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=40&grupp_kod=993&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$magnitoly_cd_mp3 = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=40&grupp_kod=993&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/magnitoly_cd_mp3", 1 );
+$allFNames [] = $magnitoly_cd_mp3 ;
+$magnitoly_cd_mp3_vls = parseFArray ( $magnitoly_cd_mp3, 'magn_cd_mp3' );
+$all_vls=array_merge ( $all_vls, $magnitoly_cd_mp3_vls );
+$magnitoly_all =array_merge ( $magnitoly_all ,$magnitoly_cd_mp3_vls );
+storeCVS($magnitoly_cd_mp3_vls,$objFields,$csvHeader,'./tmp/optvideo_magnitoly_cd_mp3.csv');
+
+// магнитолы cd_mp3_usb 
+//http://optvideo.com/new_design/new_kat/katalog.php?count_postr=1000&tab=3&count_fl=82&grupp_kod=124170&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&selind_pstr=5&brend2=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=120&grupp_kod=124170&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$magnitoly_cd_mp3_usb = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=120&grupp_kod=124170&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/magnitoly_cd_mp3_usb", 1 );
+$allFNames [] = $magnitoly_cd_mp3_usb ;
+$magnitoly_cd_mp3_usb_vls = parseFArray ( $magnitoly_cd_mp3_usb, 'magn_cd_mp3_usb' );
+$all_vls=array_merge ( $all_vls, $magnitoly_cd_mp3_usb_vls );
+$magnitoly_all =array_merge ( $magnitoly_all ,$magnitoly_cd_mp3_usb_vls );
+storeCVS($magnitoly_cd_mp3_usb_vls,$objFields,$csvHeader,'./tmp/optvideo_magnitoly_cd_mp3_usb.csv');
+storeCVS($magnitoly_all,$objFields,$csvHeader,'./tmp/optvideo_magnitoly_all.csv');
+
+// авто акустика
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=273&grupp_kod=677&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$auto_acoustic = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=273&grupp_kod=677&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/auto_acoustic", 1 );
+$allFNames [] = $auto_acoustic ;
+$auto_acoustic_vls = parseFArray ( $auto_acoustic, 'auto_acoustic' );
+$all_vls=array_merge ( $all_vls, $auto_acoustic_vls );
+storeCVS($auto_acoustic_vls ,$objFields,$csvHeader,'./tmp/optvideo_auto_acoustic.csv');
+
+// авто сабвуфер
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=45&grupp_kod=1146&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$auto_subwoofer = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=45&grupp_kod=1146&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/auto_subwoofer", 1 );
+$allFNames [] = $auto_subwoofer ;
+$auto_subwoofer_vls = parseFArray ( $auto_subwoofer, 'auto_subwoofer' );
+$all_vls=array_merge ( $all_vls, $auto_subwoofer_vls );
+storeCVS($auto_subwoofer_vls ,$objFields,$csvHeader,'./tmp/optvideo_auto_subwoofer.csv');
+
+// авто усилители
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=39&grupp_kod=1194&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$auto_usilit = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=39&grupp_kod=1194&kategory=662&grupp=%C0%C2%D2%CE-%C0%D3%C4%C8%CE%20%D2%C5%D5%CD%C8%CA%C0&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/auto_usilit", 1 );
+$allFNames [] = $auto_usilit ;
+$auto_usilit_vls = parseFArray ( $auto_usilit, 'auto_usilit' );
+$all_vls=array_merge ( $all_vls, $auto_usilit_vls );
+storeCVS($auto_usilit_vls ,$objFields,$csvHeader,'./tmp/optvideo_auto_usilit.csv');
+
+$photo_all=array();
+// цифровые фотоаппараты
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=139&grupp_kod=5760&kategory=85472&grupp=%D6%C8%D4%D0%CE%C2%DB%C5%20%D4%CE%D2%CE%C0%CF%CF%C0%D0%C0%D2%DB%20%C8%20%C2%C8%C4%C5%CE%CA%C0%CC%C5%D0%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$photo_cifra = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=139&grupp_kod=5760&kategory=85472&grupp=%D6%C8%D4%D0%CE%C2%DB%C5%20%D4%CE%D2%CE%C0%CF%CF%C0%D0%C0%D2%DB%20%C8%20%C2%C8%C4%C5%CE%CA%C0%CC%C5%D0%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/photo_cifra", 1 );
+$allFNames [] = $photo_cifra ;
+$photo_cifra_vls = parseFArray ( $photo_cifra, 'photo_cifra' );
+$all_vls=array_merge ( $all_vls, $photo_cifra_vls );
+$photo_all=array_merge ( $photo_all, $photo_cifra_vls );
+storeCVS($photo_cifra_vls ,$objFields,$csvHeader,'./tmp/optvideo_photo_cifra.csv');
+
+// цифровые видеокамеры
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=39&grupp_kod=2168&kategory=85472&grupp=%D6%C8%D4%D0%CE%C2%DB%C5%20%D4%CE%D2%CE%C0%CF%CF%C0%D0%C0%D2%DB%20%C8%20%C2%C8%C4%C5%CE%CA%C0%CC%C5%D0%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$video_cifra = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=39&grupp_kod=2168&kategory=85472&grupp=%D6%C8%D4%D0%CE%C2%DB%C5%20%D4%CE%D2%CE%C0%CF%CF%C0%D0%C0%D2%DB%20%C8%20%C2%C8%C4%C5%CE%CA%C0%CC%C5%D0%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000', "tmp/optvideo/video_cifra", 1 );
+$allFNames [] = $video_cifra ;
+$video_cifra_vls = parseFArray ( $video_cifra, 'photo_cifra' );
+$all_vls=array_merge ( $all_vls, $video_cifra_vls );
+storeCVS($video_cifra_vls ,$objFields,$csvHeader,'./tmp/optvideo_video_cifra.csv');
 
 storeCVS($all_vls,$objFields,$csvHeader,'./tmp/optvideo_all.csv');
 
