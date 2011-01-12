@@ -1,35 +1,40 @@
 == Available Spreadsheets ==
-0 | https://spreadsheets.google.com/feeds/spreadsheets/tqoQH_hxsbtklrrE9UnSayA | pleer.ru_телефоны
-1 | https://spreadsheets.google.com/feeds/spreadsheets/tZ-8YsN5J3RGLvy-RxALj1A | DVD
-2 | https://spreadsheets.google.com/feeds/spreadsheets/tpv0obYFjLykHi1iOByLyoQ | pleer.ru_gps_навигаторы
-3 | https://spreadsheets.google.com/feeds/spreadsheets/tMFQmwWPCa-b7nPmxIg7Rzg | Телевизоры LED_ LCD
-4 | https://spreadsheets.google.com/feeds/spreadsheets/tooAU0t4Nn3evAXiZc1MaAA | pleer.ru_эл_книги
-5 | https://spreadsheets.google.com/feeds/spreadsheets/tUMto954RifIsEVlHbw5c1A | Ноутбуки laptopscope
-6 | https://spreadsheets.google.com/feeds/spreadsheets/tSvTghmX9ls6pRcOfO_ohzQ | Фотоаппараты
-7 | https://spreadsheets.google.com/feeds/spreadsheets/tlzSj78sHeX8XIYVVyjINQA | pleer.ru_mp3_плееры
-8 | https://spreadsheets.google.com/feeds/spreadsheets/tw88cYPu4b6DO_h8a_tHxtw | pleer.ru_web_камеры
-9 | https://spreadsheets.google.com/feeds/spreadsheets/tMvN0r9N9-IfjCkMYZo0K5Q | pleer.ru_медиаплееры
-10 | https://spreadsheets.google.com/feeds/spreadsheets/tvRx5MP6xDWWmLHcIUeKDxQ | СВЧ печи
-11 | https://spreadsheets.google.com/feeds/spreadsheets/tDdRmdYMAj6XQWvSgOrgbVA | Кухонные комбайны
-12 | https://spreadsheets.google.com/feeds/spreadsheets/tVyuiTsRNkpqTuXPE4OfrEw | Видеокамеры
-13 | https://spreadsheets.google.com/feeds/spreadsheets/tTjf0naziCsAPbdaF__Pl6w | пылесосы
-14 | https://spreadsheets.google.com/feeds/spreadsheets/tOB3IiG5iJjHBDYvmOpGpkA | Хлебопечи
-15 | https://spreadsheets.google.com/feeds/spreadsheets/tNcnQepgmBzO0yDZv7NsoTA | Кофеварки
-16 | https://spreadsheets.google.com/feeds/spreadsheets/tvi15qjc4cTiKwEhR7LyHxA | Обогреватели
-17 | https://spreadsheets.google.com/feeds/spreadsheets/tt4YKQnSjlFr5BU5bmz53EA | Домашние кинотеатры
+0 | https://spreadsheets.google.com/feeds/spreadsheets/tbhxg40idnV7C0MxRF3NHSA | optvideo.com_магнитолы
+1 | https://spreadsheets.google.com/feeds/spreadsheets/t5dNJYPkVGOtBmIc-q_heHA | optvideo.com_автоакустика
+2 | https://spreadsheets.google.com/feeds/spreadsheets/tMFQmwWPCa-b7nPmxIg7Rzg | Телевизоры LED_ LCD
+3 | https://spreadsheets.google.com/feeds/spreadsheets/txp2CFjCFFpwjWXxB_2KLoA | optvideo.com_мониторы
+4 | https://spreadsheets.google.com/feeds/spreadsheets/tTcYqaLmqw3eZ69vks7LdoA | optvideo.com_сабвуферы
+5 | https://spreadsheets.google.com/feeds/spreadsheets/tAfJj5iIrHNSr01gCr9E6kg | optvideo.com_автоусилители
+6 | https://spreadsheets.google.com/feeds/spreadsheets/tooAU0t4Nn3evAXiZc1MaAA | pleer.ru_эл_книги
+7 | https://spreadsheets.google.com/feeds/spreadsheets/tMvN0r9N9-IfjCkMYZo0K5Q | pleer.ru_медиаплееры
+8 | https://spreadsheets.google.com/feeds/spreadsheets/tqoQH_hxsbtklrrE9UnSayA | pleer.ru_телефоны
+9 | https://spreadsheets.google.com/feeds/spreadsheets/tlzSj78sHeX8XIYVVyjINQA | pleer.ru_mp3_плееры
+10 | https://spreadsheets.google.com/feeds/spreadsheets/tw88cYPu4b6DO_h8a_tHxtw | pleer.ru_web_камеры
+11 | https://spreadsheets.google.com/feeds/spreadsheets/tpv0obYFjLykHi1iOByLyoQ | pleer.ru_gps_навигаторы
+12 | https://spreadsheets.google.com/feeds/spreadsheets/tNcnQepgmBzO0yDZv7NsoTA | Кофеварки
+13 | https://spreadsheets.google.com/feeds/spreadsheets/tWj5I3fY3pXU8qZXkpgPiNA | categories
+14 | https://spreadsheets.google.com/feeds/spreadsheets/tCxu_dqCtsoV5LUC1O28_QQ | martins.ru
+15 | https://spreadsheets.google.com/feeds/spreadsheets/tmXLzGADsfOijA_qOU9aWcg | Утюги
+16 | https://spreadsheets.google.com/feeds/spreadsheets/tSvTghmX9ls6pRcOfO_ohzQ | Фотоаппараты
+17 | https://spreadsheets.google.com/feeds/spreadsheets/tZ-8YsN5J3RGLvy-RxALj1A | DVD
 18 | https://spreadsheets.google.com/feeds/spreadsheets/tOrpOn8En7JMPEjBHGOfy8g | Музыкальные центры
-19 | https://spreadsheets.google.com/feeds/spreadsheets/t4U5deVoUxEPRJQL4Z6dZVQ | Бритвы
-20 | https://spreadsheets.google.com/feeds/spreadsheets/tvweJDmvRAwhjcgLh3xgsGQ | Блендеры
-21 | https://spreadsheets.google.com/feeds/spreadsheets/t5_wuVRJVIDwDKSOdse8uAA | Мясорубки
-22 | https://spreadsheets.google.com/feeds/spreadsheets/t1tRhUwFcy8JZAOfO2sMK_A | Фены
-23 | https://spreadsheets.google.com/feeds/spreadsheets/tCxu_dqCtsoV5LUC1O28_QQ | martins.ru
-24 | https://spreadsheets.google.com/feeds/spreadsheets/t09DS_xuYccTaInwyxkCmJQ | Стиральные машины
-25 | https://spreadsheets.google.com/feeds/spreadsheets/ttbQZXvTJXw-ZXDad6LKRgQ | Телефоны Стационарные
-26 | https://spreadsheets.google.com/feeds/spreadsheets/to3BFR2_y5Kts9BpJnzlQIg | Ноутбуки
-27 | https://spreadsheets.google.com/feeds/spreadsheets/tWj5I3fY3pXU8qZXkpgPiNA | categories
-28 | https://spreadsheets.google.com/feeds/spreadsheets/tmXLzGADsfOijA_qOU9aWcg | Утюги
-29 | https://spreadsheets.google.com/feeds/spreadsheets/tUE0IoW9FBHUeZNH7mZTXOg | Фотообъективы
-30 | https://spreadsheets.google.com/feeds/spreadsheets/t_0zyMmkOyPK5kD-fMcPBIQ | НовыеПозицииКОбработке
-31 | https://spreadsheets.google.com/feeds/spreadsheets/txoMMvdFRT9E3CAVSWQfHTA | Холодильники
-32 | https://spreadsheets.google.com/feeds/spreadsheets/tkMA6dqm5s3CYKHyAFICWpA | СоответствиеКодов
-33 | https://spreadsheets.google.com/feeds/spreadsheets/tJJqOourTWEq2wNKCII_Bew | AudioMagnitoly
+19 | https://spreadsheets.google.com/feeds/spreadsheets/tVyuiTsRNkpqTuXPE4OfrEw | Видеокамеры
+20 | https://spreadsheets.google.com/feeds/spreadsheets/tOB3IiG5iJjHBDYvmOpGpkA | Хлебопечи
+21 | https://spreadsheets.google.com/feeds/spreadsheets/tTjf0naziCsAPbdaF__Pl6w | пылесосы
+22 | https://spreadsheets.google.com/feeds/spreadsheets/tvRx5MP6xDWWmLHcIUeKDxQ | СВЧ печи
+23 | https://spreadsheets.google.com/feeds/spreadsheets/tUMto954RifIsEVlHbw5c1A | Ноутбуки laptopscope
+24 | https://spreadsheets.google.com/feeds/spreadsheets/ttbQZXvTJXw-ZXDad6LKRgQ | Телефоны Стационарные
+25 | https://spreadsheets.google.com/feeds/spreadsheets/tt4YKQnSjlFr5BU5bmz53EA | Домашние кинотеатры
+26 | https://spreadsheets.google.com/feeds/spreadsheets/t1tRhUwFcy8JZAOfO2sMK_A | Фены
+27 | https://spreadsheets.google.com/feeds/spreadsheets/tvi15qjc4cTiKwEhR7LyHxA | Обогреватели
+28 | https://spreadsheets.google.com/feeds/spreadsheets/t4U5deVoUxEPRJQL4Z6dZVQ | Бритвы
+29 | https://spreadsheets.google.com/feeds/spreadsheets/txoMMvdFRT9E3CAVSWQfHTA | Холодильники
+30 | https://spreadsheets.google.com/feeds/spreadsheets/t5_wuVRJVIDwDKSOdse8uAA | Мясорубки
+31 | https://spreadsheets.google.com/feeds/spreadsheets/tvweJDmvRAwhjcgLh3xgsGQ | Блендеры
+32 | https://spreadsheets.google.com/feeds/spreadsheets/tDdRmdYMAj6XQWvSgOrgbVA | Кухонные комбайны
+33 | https://spreadsheets.google.com/feeds/spreadsheets/t09DS_xuYccTaInwyxkCmJQ | Стиральные машины
+34 | https://spreadsheets.google.com/feeds/spreadsheets/to3BFR2_y5Kts9BpJnzlQIg | Ноутбуки
+35 | https://spreadsheets.google.com/feeds/spreadsheets/tUE0IoW9FBHUeZNH7mZTXOg | Фотообъективы
+36 | https://spreadsheets.google.com/feeds/spreadsheets/t_0zyMmkOyPK5kD-fMcPBIQ | НовыеПозицииКОбработке
+37 | https://spreadsheets.google.com/feeds/spreadsheets/tkMA6dqm5s3CYKHyAFICWpA | СоответствиеКодов
+38 | https://spreadsheets.google.com/feeds/spreadsheets/tJJqOourTWEq2wNKCII_Bew | AudioMagnitoly

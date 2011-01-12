@@ -266,6 +266,8 @@ class GetAvailableDocuments {
       "pleer.ru_медиаплееры" === $entry->title->text || 
 
       "pleer.ru_эл_книги" === $entry->title->text || 
+      
+      "optvideo.com_магнитолы" === $entry->title->text || 
 
       false) {
         //
