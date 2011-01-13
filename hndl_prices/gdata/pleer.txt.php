@@ -159,6 +159,7 @@ loadPleerRuPrice ( 'http://pleer.ru/gps-avtonavigaciya.html', "./tmp/pleer.ru/gp
 loadPleerRuPrice ( 'http://pleer.ru/vebkamery.html', "./tmp/pleer.ru/webcams.html", "tmp/pleer_webcams.csv",$fullPrice );
 loadPleerRuPrice ( 'http://pleer.ru/1gb-i-bolee.html', "./tmp/pleer.ru/mp3pleer.html", "tmp/pleer_mp3pleer.csv",$fullPrice );
 loadPleerRuPrice ( 'http://pleer.ru/cifrovye-fotoapparaty~all.html', "./tmp/pleer.ru/photoapp.html", "tmp/pleer_photoapp.csv",$fullPrice );
+loadPleerRuPrice ( 'http://www.pleer.ru/dlya-minolta_v.html', "./tmp/pleer.ru/photo_vsp_minolta.html", "tmp/pleer_photo_vsp_minolta.csv",$fullPrice );
 
 storeCVS($fullPrice, "tmp/pleer_all.csv");
 
