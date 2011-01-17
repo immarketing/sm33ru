@@ -71,6 +71,8 @@ define ( "ADV_GGL_WRITE", "advert.google.write_adv", true );
 
 define ( "SM_ADV_NAME", "sm.adv.name", true );
 
+define ( "SM_GEO_COMP_KOVROV", "KOVROV", true );
+define ( "SM_GEO_COMP_VLADIMIR", "VLADIMIR", true );
 /*
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
 define ( "SM_CATEGORY_REFERENCE", "sm.category.reference", true );
@@ -266,8 +268,14 @@ class GetAvailableDocuments {
       "pleer.ru_медиаплееры" === $entry->title->text || 
 
       "pleer.ru_эл_книги" === $entry->title->text || 
-      
+
       "optvideo.com_магнитолы" === $entry->title->text || 
+
+      "pleer.ru_фотовспышки_minolta_sony" === $entry->title->text || 
+
+      "optvideo.com_мониторы" === $entry->title->text || 
+
+      "optvideo.com_телевизоры" === $entry->title->text || 
 
       false) {
         //
@@ -1178,7 +1186,10 @@ EOT_EOT;
     }
   }
   
-  private function getEmptyGoogleAdvertisingArray() {
+  private function getEmptyGoogleAdvertisingArray($compGeo) {
+    if ($compGeo == SM_GEO_COMP_VLADIMIR) {
+      return array ('Реклама магазина SuperMarket33.ru (Владимир)', '', '', '', '', '', '', '', '', 'active', 'active', 'active', 'active', 'add' );
+    }
     return array ('Реклама магазина SuperMarket33.ru', '', '', '', '', '', '', '', '', 'active', 'active', 'active', 'active', 'add' );
   }
   
@@ -1190,12 +1201,12 @@ EOT_EOT;
     }
     return $res;
   }
-  private function writeGoogleAdvertisingGroupToTempFile($destFile, $docInfo, $prodInfo) {
+  private function writeGoogleAdvertisingGroupToTempFile($destFile, $docInfo, $prodInfo, $compGeo = SM_GEO_COMP_KOVROV) {
     // одна группа на один продукт
     if (! $prodInfo ['sm.публиковать']) {
       return;
     }
-    $advInfo = $this->getEmptyGoogleAdvertisingArray ();
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ( $compGeo );
     $prodName = $prodInfo [SM_ADV_NAME];
     if (! $prodName) {
       $prodName = $prodInfo ['Наименование'];
@@ -1213,13 +1224,13 @@ EOT_EOT;
   
   }
   
-  private function writeGoogleAdvertisingMessagesToTempFile($destFile, $docInfo, $prodInfo, $groupName) {
+  private function writeGoogleAdvertisingMessagesToTempFile($destFile, $docInfo, $prodInfo, $groupName, $compGeo ) {
     // одно/несколько объявлений на продукт
     if (! $prodInfo ['sm.публиковать']) {
       return;
     }
     
-    $advInfo = $this->getEmptyGoogleAdvertisingArray ();
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ( $compGeo );
     $prodName = $prodInfo [SM_ADV_NAME];
     $prodName = $prodInfo [SM_ADV_NAME];
     if (! $prodName) {
@@ -1235,8 +1246,14 @@ EOT_EOT;
     
 
     $advInfo [4] = strtolower ( $prodName );
-    $advInfo [5] = 'Доставка бесплатно';
-    $advInfo [6] = 'Купи в Коврове ' . $prodPrice . 'р';
+    if ($compGeo == SM_GEO_COMP_VLADIMIR) {
+      $advInfo [5] = 'На заказ. С доставкой';
+      $advInfo [6] = 'Во Владимире ' . $prodPrice . 'р';
+    } else {
+      $advInfo [5] = 'Доставка бесплатно';
+      $advInfo [6] = 'Купи в Коврове ' . $prodPrice . 'р';
+    }
+    
     $advInfo [7] = 'www.supermarket33.ru';
     $advInfo [8] = 'http://www.supermarket33.ru/index.php?page=shop.product_details&product_id=' . ($prodID) . '&option=com_virtuemart';
     
@@ -1244,12 +1261,12 @@ EOT_EOT;
   
   }
   
-  private function writeGoogleAdvertisingKeyWordsToTempFile($destFile, $docInfo, $prodInfo, $groupName) {
+  private function writeGoogleAdvertisingKeyWordsToTempFile($destFile, $docInfo, $prodInfo, $groupName, $compGeo = SM_GEO_COMP_KOVROV) {
     if (! $prodInfo ['sm.публиковать']) {
       return;
     }
     
-    $advInfo = $this->getEmptyGoogleAdvertisingArray ();
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ($compGeo);
     $prodName = $prodInfo [SM_ADV_NAME];
     if (! $prodName) {
       $prodName = $prodInfo ['Наименование'];
@@ -1260,7 +1277,7 @@ EOT_EOT;
     
     $kwArray = preg_split ( '/,/', $kWords );
     
-    $advInfo = $this->getEmptyGoogleAdvertisingArray ();
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ($compGeo);
     $advInfo [1] = $groupName;
     $advInfo [3] = 'Broad';
     
@@ -1283,8 +1300,8 @@ EOT_EOT;
   
   }
   
-  private function writeGoogleAdvertisingToTempFile() {
-    $csvile = @fopen ( "tmp/adv_google.csv", "w" );
+  private function writeGoogleAdvertisingToTempFile($compGeo= SM_GEO_COMP_KOVROV, $fName="tmp/adv_google.csv") {
+    $csvile = @fopen ( $fName, "w" );
     //$advInfo = array ('id', 'name', 'selfname', 'sm.категория.1', 'sm.категория.2', 'sm.категория.3', 'parentid' );
     $advInfo = array ('Campaign', 'Ad Group', 'Keyword', 'Keyword Type', 'Headline', 'Description Line 1', 'Description Line 2', 'Display URL', 'Destination URL', 'Campaign Status', 'AdGroup Status', 'Creative Status', 'Keyword Status', 'Suggested Changes' );
     
@@ -1297,9 +1314,9 @@ EOT_EOT;
       }
       //echo "$k == $v\n";
       foreach ( $data as $dk => $dv ) {
-        $gName = $this->writeGoogleAdvertisingGroupToTempFile ( $csvile, $v, $dv );
-        $this->writeGoogleAdvertisingMessagesToTempFile ( $csvile, $v, $dv, $gName );
-        $this->writeGoogleAdvertisingKeyWordsToTempFile ( $csvile, $v, $dv, $gName );
+        $gName = $this->writeGoogleAdvertisingGroupToTempFile ( $csvile, $v, $dv,$compGeo );
+        $this->writeGoogleAdvertisingMessagesToTempFile ( $csvile, $v, $dv, $gName,$compGeo );
+        $this->writeGoogleAdvertisingKeyWordsToTempFile ( $csvile, $v, $dv, $gName,$compGeo );
       }
       ;
     
@@ -1496,7 +1513,9 @@ EOT_EOT;
     
     $this->createAndWriteSQLs ();
     
-    $this->writeGoogleAdvertisingToTempFile ();
+    $this->writeGoogleAdvertisingToTempFile (SM_GEO_COMP_KOVROV,"tmp/adv_google_kovrov.csv");
+    $this->writeGoogleAdvertisingToTempFile (SM_GEO_COMP_VLADIMIR,"tmp/adv_google_vladimir.csv");
+    
     die ( "\nAll done                   \n" );
     
     /*
