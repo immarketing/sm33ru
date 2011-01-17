@@ -145,10 +145,13 @@ function renewPricesFromLoadedPleerRu(dataSheet, priceSheet) {
 			.getValues();
 	var codeIndex2 = titles2[0].indexOf('pleer_ru_code');
 	var priceIndex2 = titles2[0].indexOf('pleer_ru_price');
+	var pblIndex2 = titles2[0].indexOf('nalichie');
 
 	var codeArr2 = sheetPrice.getRange(1, codeIndex2 + 1,
 			sheetPrice.getLastRow(), 1).getValues();
 	var priceArr2 = sheetPrice.getRange(1, priceIndex2 + 1,
+			sheetPrice.getLastRow(), 1).getValues();
+	var pblArr2 = sheetPrice.getRange(1, pblIndex2 + 1,
 			sheetPrice.getLastRow(), 1).getValues();
 
 	// var refPriceArr = sheetPrice.getRange(1, 1, sheetPrice.getLastRow(),
@@ -164,7 +167,7 @@ function renewPricesFromLoadedPleerRu(dataSheet, priceSheet) {
 		if (priceArr2[i][0] < 0){
 			return 0;
 		}
-		refPriceArrPblc[i] = 1;
+		refPriceArrPblc[i] = pblArr2[i][0];
 	}
 	// Logger.log(refPriceArrCode);
 	// Logger.log(refPriceArrCode[1]);
@@ -188,7 +191,7 @@ function renewPricesFromLoadedPleerRu(dataSheet, priceSheet) {
 			if (priceArr[i][0] < 0){
 				return 0;
 			}
-			pblcArr[i][0] = 1;
+			pblcArr[i][0] = refPriceArrPblc[cInd];
 			refPriceArrPblc[cInd] = -1;
 		}
 	}
