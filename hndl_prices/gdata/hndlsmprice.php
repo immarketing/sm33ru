@@ -25,6 +25,8 @@ include ('class.img2thumb.php');
  */
 require_once 'Zend/Loader.php';
 
+require_once 'sm33/myandexexp.php';
+
 /**
  * @see Zend_Gdata
  */
@@ -220,7 +222,6 @@ class GetAvailableDocuments {
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
       if (
-
       "СВЧ печи" === $entry->title->text || //
 
 
@@ -269,13 +270,23 @@ class GetAvailableDocuments {
 
       "pleer.ru_эл_книги" === $entry->title->text || 
 
-      "optvideo.com_магнитолы" === $entry->title->text || 
-
       "pleer.ru_фотовспышки_minolta_sony" === $entry->title->text || 
+
+      "pleer.ru_фотоаппараты" === $entry->title->text || 
+      
+      "optvideo.com_магнитолы" === $entry->title->text || 
 
       "optvideo.com_мониторы" === $entry->title->text || 
 
       "optvideo.com_телевизоры" === $entry->title->text || 
+
+      "optvideo.com_автоакустика" === $entry->title->text || 
+
+      "optvideo.com_сабвуферы" === $entry->title->text ||
+
+      "optvideo.com_автоусилители" === $entry->title->text || 
+      
+      // pleer.ru_фотоаппараты
 
       false) {
         //
@@ -1224,7 +1235,7 @@ EOT_EOT;
   
   }
   
-  private function writeGoogleAdvertisingMessagesToTempFile($destFile, $docInfo, $prodInfo, $groupName, $compGeo ) {
+  private function writeGoogleAdvertisingMessagesToTempFile($destFile, $docInfo, $prodInfo, $groupName, $compGeo) {
     // одно/несколько объявлений на продукт
     if (! $prodInfo ['sm.публиковать']) {
       return;
@@ -1266,7 +1277,7 @@ EOT_EOT;
       return;
     }
     
-    $advInfo = $this->getEmptyGoogleAdvertisingArray ($compGeo);
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ( $compGeo );
     $prodName = $prodInfo [SM_ADV_NAME];
     if (! $prodName) {
       $prodName = $prodInfo ['Наименование'];
@@ -1277,7 +1288,7 @@ EOT_EOT;
     
     $kwArray = preg_split ( '/,/', $kWords );
     
-    $advInfo = $this->getEmptyGoogleAdvertisingArray ($compGeo);
+    $advInfo = $this->getEmptyGoogleAdvertisingArray ( $compGeo );
     $advInfo [1] = $groupName;
     $advInfo [3] = 'Broad';
     
@@ -1300,7 +1311,7 @@ EOT_EOT;
   
   }
   
-  private function writeGoogleAdvertisingToTempFile($compGeo= SM_GEO_COMP_KOVROV, $fName="tmp/adv_google.csv") {
+  private function writeGoogleAdvertisingToTempFile($compGeo = SM_GEO_COMP_KOVROV, $fName = "tmp/adv_google.csv") {
     $csvile = @fopen ( $fName, "w" );
     //$advInfo = array ('id', 'name', 'selfname', 'sm.категория.1', 'sm.категория.2', 'sm.категория.3', 'parentid' );
     $advInfo = array ('Campaign', 'Ad Group', 'Keyword', 'Keyword Type', 'Headline', 'Description Line 1', 'Description Line 2', 'Display URL', 'Destination URL', 'Campaign Status', 'AdGroup Status', 'Creative Status', 'Keyword Status', 'Suggested Changes' );
@@ -1314,15 +1325,147 @@ EOT_EOT;
       }
       //echo "$k == $v\n";
       foreach ( $data as $dk => $dv ) {
-        $gName = $this->writeGoogleAdvertisingGroupToTempFile ( $csvile, $v, $dv,$compGeo );
-        $this->writeGoogleAdvertisingMessagesToTempFile ( $csvile, $v, $dv, $gName,$compGeo );
-        $this->writeGoogleAdvertisingKeyWordsToTempFile ( $csvile, $v, $dv, $gName,$compGeo );
+        $gName = $this->writeGoogleAdvertisingGroupToTempFile ( $csvile, $v, $dv, $compGeo );
+        $this->writeGoogleAdvertisingMessagesToTempFile ( $csvile, $v, $dv, $gName, $compGeo );
+        $this->writeGoogleAdvertisingKeyWordsToTempFile ( $csvile, $v, $dv, $gName, $compGeo );
       }
       ;
     
     }
     fclose ( $csvile );
   
+  }
+  
+  private function writeCategoriesToYML($YMLWriter) {
+    /*
+    $categoryInfo['id']
+    $categoryInfo['name']
+    $categoryInfo['parentId']
+    
+    
+     * 
+     */
+    foreach ( $this->categories as $k => $v ) {
+      $categoryInfo ['id'] = $v ['id'];
+      $categoryInfo ['name'] = $v ['selfname'];
+      $categoryInfo ['parentId'] = $v ['parentid'];
+      $YMLWriter->writeCategoryElement ( $categoryInfo );
+    }
+  }
+  
+  private function writeOffersToYML($YMLWriter) {
+    $YMLWriter->writeOffersElementStart ();
+    foreach ( $this->workDocs as $k => $v ) {
+      $data = $this->workDocs [$k] [DATA];
+      /*
+      if (! $this->workDocs [$k] [ADV_GGL_WRITE]) {
+        continue;
+      }
+      */
+      foreach ( $data as $dk => $dv ) {
+        if (! $dv ['sm.публиковать']) {
+          continue;
+        }
+        
+        //$offer ['type'] = 'vendor.model';
+        $offer ['available'] = 'false';
+        $offer ['bid'] = NULL;
+        
+        $prodID = $dv [SM_INTERNAL_RECALC_ID];
+        $offer ['id'] = $prodID;
+        $url = 'http://www.supermarket33.ru/index.php?page=shop.product_details&product_id=' . ($prodID) . '&option=com_virtuemart';
+        $pct = 'http://www.supermarket33.ru/components/com_virtuemart/shop_image/product/' . $prodID . '.jpg';
+        $offer ['url'] = $url;
+        $offer ['picture'] = $pct;
+        
+        $offer ['currencyId'] = 'RUR';
+        $offer ['delivery'] = 'true';
+        
+        // sales_notes
+        $offer ['sales_notes'] = 'Требуется предоплата. Акция "Назначь свою цену!"';
+        
+        $offer ['price'] = $dv [SM_INTERNAL_PRICE];
+        
+        //name
+        $offer ['name'] = $dv ['Наименование'];
+        
+        // vendor
+        $offer ['vendor'] = $dv ['Производитель'];
+        
+        //description
+        $offer ['description'] = $dv ['Описание'];
+        
+        // categoryId
+        $offer ['categoryId'] = $this->categories [$dv [SM_CATEGORY_REFERENCE]] ["id"];
+        
+        //local_delivery_cost
+        $offer ['local_delivery_cost'] = 0;
+        
+        $YMLWriter->writeOfferElement ( $offer );
+        /*
+        $gName = $this->writeGoogleAdvertisingGroupToTempFile ( $csvile, $v, $dv, $compGeo );
+        $this->writeGoogleAdvertisingMessagesToTempFile ( $csvile, $v, $dv, $gName, $compGeo );
+        $this->writeGoogleAdvertisingKeyWordsToTempFile ( $csvile, $v, $dv, $gName, $compGeo );
+        */
+      }
+      ;
+    
+    }
+    
+    $YMLWriter->writeOffersElementFinish ();
+  }
+  private function writeYMLToTempFile($fName) {
+    //doWriteYMLToTempFile($fName);
+    $YMLWriter = new sm33_myandexexp ( $fName );
+    $YMLWriter->writeHDR ();
+    $YMLWriter->writeRootStart ();
+    
+    $shopInfo ['name'] = 'SuperMarket33.ru';
+    $shopInfo ['company'] = 'ООО СУПЕРМАРКЕТ33';
+    $shopInfo ['url'] = 'http://www.supermarket33.ru';
+    
+    $YMLWriter->writeShopElementStart ( $shopInfo );
+    
+    $YMLWriter->writeCurrenciesElement ();
+    $YMLWriter->writeCategoriesElementStart ();
+    $this->writeCategoriesToYML ( $YMLWriter );
+    
+    $YMLWriter->writeCategoriesElementFinish ();
+    
+    $YMLWriter->writeLocalDeliveryElement ( 0 );
+    
+    $this->writeOffersToYML ( $YMLWriter );
+    
+    //$csvile = @fopen ( $fName, "w" );
+    //$advInfo = array ('id', 'name', 'selfname', 'sm.категория.1', 'sm.категория.2', 'sm.категория.3', 'parentid' );
+    /*
+
+    $advInfo = array ('Campaign', 'Ad Group', 'Keyword', 'Keyword Type', 'Headline', 'Description Line 1', 'Description Line 2', 'Display URL', 'Destination URL', 'Campaign Status', 'AdGroup Status', 'Creative Status', 'Keyword Status', 'Suggested Changes' );
+    
+    fputcsv ( $csvile, $advInfo );
+    
+    foreach ( $this->workDocs as $k => $v ) {
+      $data = $this->workDocs [$k] [DATA];
+      if (! $this->workDocs [$k] [ADV_GGL_WRITE]) {
+        continue;
+      }
+      //echo "$k == $v\n";
+      foreach ( $data as $dk => $dv ) {
+        $gName = $this->writeGoogleAdvertisingGroupToTempFile ( $csvile, $v, $dv, $compGeo );
+        $this->writeGoogleAdvertisingMessagesToTempFile ( $csvile, $v, $dv, $gName, $compGeo );
+        $this->writeGoogleAdvertisingKeyWordsToTempFile ( $csvile, $v, $dv, $gName, $compGeo );
+      }
+      ;
+    
+    }
+    */
+    $YMLWriter->writeShopElementFinish ( $shopInfo );
+    $YMLWriter->writeRootFinish ();
+    $YMLWriter->closeFile ();
+    
+  //  fclose ( $csvile );
+  
+
   }
   
   private function writeCategoriesToTempFile() {
@@ -1513,8 +1656,9 @@ EOT_EOT;
     
     $this->createAndWriteSQLs ();
     
-    $this->writeGoogleAdvertisingToTempFile (SM_GEO_COMP_KOVROV,"tmp/adv_google_kovrov.csv");
-    $this->writeGoogleAdvertisingToTempFile (SM_GEO_COMP_VLADIMIR,"tmp/adv_google_vladimir.csv");
+    $this->writeGoogleAdvertisingToTempFile ( SM_GEO_COMP_KOVROV, "tmp/adv_google_kovrov.csv" );
+    $this->writeGoogleAdvertisingToTempFile ( SM_GEO_COMP_VLADIMIR, "tmp/adv_google_vladimir.csv" );
+    $this->writeYMLToTempFile ( './tmp/yandex/testyml.xml' );
     
     die ( "\nAll done                   \n" );
     
