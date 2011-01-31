@@ -464,6 +464,31 @@ $video_cifra_vls = parseFArray ( $video_cifra, 'photo_cifra' );
 $all_vls=array_merge ( $all_vls, $video_cifra_vls );
 storeCVS($video_cifra_vls ,$objFields,$csvHeader,'./tmp/optvideo_video_cifra.csv');
 
+// швейные машины
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=70&grupp_kod=109211&kategory=123785&grupp=%D3%D5%CE%C4%20%C7%C0%20%CE%C4%C5%C6%C4%CE%C9&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$shv_mash = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=70&grupp_kod=109211&kategory=123785&grupp=%D3%D5%CE%C4%20%C7%C0%20%CE%C4%C5%C6%C4%CE%C9&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000',"tmp/optvideo/shvei_mash", 1 );
+$allFNames [] = $video_cifra ;
+$shv_mash_vls = parseFArray ( $shv_mash, 'shvei_mash' );
+$all_vls=array_merge ( $all_vls, $shv_mash_vls );
+storeCVS($shv_mash_vls ,$objFields,$csvHeader,'./tmp/optvideo_shvei_mash.csv');
+
+// утюги
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=214&grupp_kod=2544&kategory=123785&grupp=%D3%D5%CE%C4%20%C7%C0%20%CE%C4%C5%C6%C4%CE%C9&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=0&brend2=xxx&count_postr=10
+$utyugi = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=214&grupp_kod=2544&kategory=123785&grupp=%D3%D5%CE%C4%20%C7%C0%20%CE%C4%C5%C6%C4%CE%C9&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=0&brend2=xxx&count_postr=1000',"tmp/optvideo/utyugi", 1 );
+$allFNames [] = $utyugi ;
+$utyugi_vls = parseFArray ( $utyugi, 'utyugi' );
+$all_vls=array_merge ( $all_vls, $utyugi_vls );
+storeCVS($utyugi_vls ,$objFields,$csvHeader,'./tmp/optvideo_utyugi.csv');
+
+// Конвекторы электрические
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=26&grupp_kod=123788&kategory=77826&grupp=%CA%CE%CD%C2%C5%CA%D2%CE%D0%DB%20%DD%CB%C5%CA%D2%D0%C8%D7%C5%D1%CA%C8%C5&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=26&grupp_kod=123788&kategory=77826&grupp=%CA%CE%CD%C2%C5%CA%D2%CE%D0%DB%20%DD%CB%C5%CA%D2%D0%C8%D7%C5%D1%CA%C8%C5&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$konv = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=26&grupp_kod=123788&kategory=77826&grupp=%CA%CE%CD%C2%C5%CA%D2%CE%D0%DB%20%DD%CB%C5%CA%D2%D0%C8%D7%C5%D1%CA%C8%C5&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000',"tmp/optvideo/konvectors", 1 );
+$allFNames [] = $konv ;
+$konv_vls = parseFArray ( $konv, 'konvectors' );
+$all_vls=array_merge ( $all_vls, $konv_vls  );
+storeCVS($konv_vls  ,$objFields,$csvHeader,'./tmp/optvideo_konvectors.csv');
+
 storeCVS($all_vls,$objFields,$csvHeader,'./tmp/optvideo_all.csv');
 
 //print_r($allFNames);
