@@ -274,6 +274,8 @@ class GetAvailableDocuments {
 
       "pleer.ru_фотоаппараты" === $entry->title->text || 
       
+      "pleer.ru_gps_навигаторы" === $entry->title->text || 
+      
       "optvideo.com_магнитолы" === $entry->title->text || 
 
       "optvideo.com_мониторы" === $entry->title->text || 
@@ -284,9 +286,11 @@ class GetAvailableDocuments {
 
       "optvideo.com_сабвуферы" === $entry->title->text ||
 
-      "optvideo.com_автоусилители" === $entry->title->text || 
+      "optvideo.com_автоусилители" === $entry->title->text ||
       
-      // pleer.ru_фотоаппараты
+      "optvideo.com_швейные_машины" === $entry->title->text ||
+      
+      "optvideo.com_конвекторы" === $entry->title->text ||
 
       false) {
         //
