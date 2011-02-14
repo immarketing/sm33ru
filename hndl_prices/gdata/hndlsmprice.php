@@ -70,6 +70,7 @@ define ( "SM_INTERNAL_PRICE", "sm.цена", true );
 
 define ( "ADV_GGL_KEYWORDS", "advert.google.key_words", true );
 define ( "ADV_GGL_WRITE", "advert.google.write_adv", true );
+define ( "ADV_YNDX_WRITE", "advert.market.yandex.write_adv", true );
 
 define ( "SM_ADV_NAME", "sm.adv.name", true );
 
@@ -214,6 +215,7 @@ class GetAvailableDocuments {
     $prodNames = array ("СВЧ печи" => "свч", "Утюги" => "утюг", "Обогреватели" => "", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч", "СВЧ печи" => "свч" );
     $prodKeyWords = array ("СВЧ печи" => "свч, микроволновка, микроволновки", "Утюги" => "утюг, утюги", "Обогреватели" => "обогреватель, масляный обогреватель", "Видеокамеры" => "видеокамера, видеокамеры", "Хлебопечи" => "Хлебопечи, хлебопечь", "Кофеварки" => "Кофеварки, Кофеварка", "Фотоаппараты" => "Фотоаппарат,Фотоаппараты", "Домашние кинотеатры" => "Домашние кинотеатры, Домашний кинотеатр, DVD, blu-ray", "Музыкальные центры" => "Музыкальные центры, Музыкальный центр", "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", "DVD" => "DVD, blu-ray", "пылесосы" => "пылесосы, пылесос", "Фотообъективы" => "Фотообъективы,Фотообъектив", "Блендеры" => "Блендеры, Блендер", "Бритвы" => "Бритвы, Бритва", "Фены" => "Фены, Фен", "Мясорубки" => "Мясорубки, Мясорубка", "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки", "pleer.ru_телефоны" => "Телефон, телефоны, коммуникаторы, коммуникатор, смартфон, смартфоны" );
     $prodWriteAdv = array ("СВЧ печи" => "свч, микроволновка, микроволновки", "Хлебопечи" => "Хлебопечи, хлебопечь", "Телевизоры LED_ LCD" => "телевизор, телевизоры, tv, lcd, плазма", "Ноутбуки laptopscope" => "Ноутбуки, ноутбук, нетбук, нетбуки", "pleer.ru_телефоны" => "Телефон, телефоны, коммуникаторы, коммуникатор, смартфон, смартфоны" );
+    $prodWriteAdvYndx = array ("Видеокамеры" => 1, "Хлебопечи" => 1, "Кофеварки" => 1, "Фотоаппараты" => 1, "Телевизоры LED_ LCD" => 1, "Ноутбуки laptopscope" => 0, "pleer.ru_эл_книги" => 1, "pleer.ru_фотоаппараты" => 1, "pleer.ru_gps_навигаторы" => 1, "optvideo.com_магнитолы" => 1, "optvideo.com_мониторы" => 1, "optvideo.com_телевизоры" => 1, "optvideo.com_автоакустика" => 1, "optvideo.com_сабвуферы" => 1, "optvideo.com_автоусилители" => 1, "optvideo.com_швейные_машины" => 1, "optvideo.com_конвекторы" => 1, "zzzzz" );
     $res = array ();
     
     $feed = $this->gdClient->getSpreadsheetFeed ();
@@ -222,8 +224,9 @@ class GetAvailableDocuments {
     foreach ( $feed->entries as $entry ) {
       //print $i . ' | ' . $entry->id->text . ' | ' . $entry->title->text . "\n";
       if (
+      /*
+      */
       "СВЧ печи" === $entry->title->text || //
-
 
       "Утюги" === $entry->title->text || //
 
@@ -244,7 +247,7 @@ class GetAvailableDocuments {
 
       "Домашние кинотеатры" === $entry->title->text || 
 
-      "Музыкальные центры" === $entry->title->text || 
+      "Музыкальные центры" === $entry->title->text ||
 
       "Телевизоры LED_ LCD" === $entry->title->text || 
 
@@ -273,9 +276,9 @@ class GetAvailableDocuments {
       "pleer.ru_фотовспышки_minolta_sony" === $entry->title->text || 
 
       "pleer.ru_фотоаппараты" === $entry->title->text || 
-      
+
       "pleer.ru_gps_навигаторы" === $entry->title->text || 
-      
+
       "optvideo.com_магнитолы" === $entry->title->text || 
 
       "optvideo.com_мониторы" === $entry->title->text || 
@@ -284,13 +287,15 @@ class GetAvailableDocuments {
 
       "optvideo.com_автоакустика" === $entry->title->text || 
 
-      "optvideo.com_сабвуферы" === $entry->title->text ||
+      "optvideo.com_сабвуферы" === $entry->title->text || 
 
-      "optvideo.com_автоусилители" === $entry->title->text ||
-      
-      "optvideo.com_швейные_машины" === $entry->title->text ||
-      
-      "optvideo.com_конвекторы" === $entry->title->text ||
+      "optvideo.com_автоусилители" === $entry->title->text || 
+
+      "optvideo.com_швейные_машины" === $entry->title->text || 
+
+      "optvideo.com_конвекторы" === $entry->title->text || 
+      /* 
+      */
 
       false) {
         //
@@ -298,6 +303,9 @@ class GetAvailableDocuments {
         $res [$entry->title->text] [NAME] = $entry->title->text;
         $res [$entry->title->text] [ADV_GGL_KEYWORDS] = $prodKeyWords [$entry->title->text];
         $res [$entry->title->text] [ADV_GGL_WRITE] = $prodWriteAdv [$entry->title->text];
+        
+        $res [$entry->title->text] [ADV_YNDX_WRITE] = $prodWriteAdvYndx [$entry->title->text];
+        
       }
       //$i ++;
     }
@@ -772,7 +780,8 @@ EOT_EOT;
     $prodIDVK = $curProd [SM_INTERNAL_RECALC_ID];
     $prodURLVK = 'http://www.supermarket33.ru/index.php?page=shop.product_details&product_id=' . ($prodIDVK) . '&option=com_virtuemart';
     $fullPURL = $curProd [SM_INTERNAL_FULLPICTURL];
-    $prodImgURLVK = "http://www.supermarket33.ru/components/com_virtuemart/shop_image/product/$fullPURL";
+    //$prodImgURLVK = "http://www.supermarket33.ru/components/com_virtuemart/shop_image/product/$fullPURL";
+    $prodImgURLVK = "http://www.supermarket33.ru/components/com_virtuemart/shop_image/product/$prodIDVK.jpg";
     
     $result .= '<script type="text/javascript">' . "if (showVKontakteButton) showVKontakteButton('$prodURLVK','$prodNameVK','Купи [$prodNameVK] на <br/> -=SuperMarket33.ru=-','$prodImgURLVK');" . 'if (showSocialSharing) showSocialSharing(1);' . '</script>';
     
@@ -1361,11 +1370,9 @@ EOT_EOT;
     $YMLWriter->writeOffersElementStart ();
     foreach ( $this->workDocs as $k => $v ) {
       $data = $this->workDocs [$k] [DATA];
-      /*
-      if (! $this->workDocs [$k] [ADV_GGL_WRITE]) {
+      if (! $this->workDocs [$k] [ADV_YNDX_WRITE]) {
         continue;
       }
-      */
       foreach ( $data as $dk => $dv ) {
         if (! $dv ['sm.публиковать']) {
           continue;
@@ -1386,12 +1393,12 @@ EOT_EOT;
         $offer ['delivery'] = 'true';
         
         // sales_notes
-        $offer ['sales_notes'] = 'Требуется предоплата. Акция "Назначь свою цену!"';
+        $offer ['sales_notes'] = 'Требуется предоплата.';
         
         $offer ['price'] = $dv [SM_INTERNAL_PRICE];
         
         //name
-        $offer ['name'] = $dv ['Наименование'];
+        $offer ['name'] = strtolower ( $dv ['Наименование'] );
         
         // vendor
         $offer ['vendor'] = $dv ['Производитель'];
