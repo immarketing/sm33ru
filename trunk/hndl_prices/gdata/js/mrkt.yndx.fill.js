@@ -1,4 +1,4 @@
-function onOpen2() {
+function onOpen() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var menuEntries = [ 
     {name: "Заполнить текущую строку данными с market.yandex.ru", functionName: "fillSelectedRow2"}
@@ -42,7 +42,7 @@ function fillSelectedRow2(){
   /*
   Logger.log("mrktURLClm == "+ mrktURLClm);  
       */
-  var values2 = sheet.getRange(actCell.getRowIndex(), 1, actCell.getRowIndex(), lastClm).getValues();    
+  var values2 = sheet.getRange(actCell.getRowIndex(), 1, 1, lastClm).getValues();    
   /*
   Logger.log("values2 == "+ values2);    
   Logger.log("values2[mrktURLClm] == "+ values2[0][mrktURLClm-1]);    

@@ -489,6 +489,32 @@ $konv_vls = parseFArray ( $konv, 'konvectors' );
 $all_vls=array_merge ( $all_vls, $konv_vls  );
 storeCVS($konv_vls  ,$objFields,$csvHeader,'./tmp/optvideo_konvectors.csv');
 
+// мобильные телефоны
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=320&grupp_kod=8195&kategory=6387&grupp=%D2%C5%CB%C5%D4%CE%CD%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$orionMobGSM = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=320&grupp_kod=8195&kategory=6387&grupp=%D2%C5%CB%C5%D4%CE%CD%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000',"tmp/optvideo/mob_gsm", 1 );
+$allFNames [] = $orionMobGSM ;
+$orionMobGSM_vls = parseFArray ( $orionMobGSM, 'mob_gsm' );
+$all_vls=array_merge ( $all_vls, $orionMobGSM_vls  );
+storeCVS($orionMobGSM_vls  ,$objFields,$csvHeader,'./tmp/optvideo_mobgsm.csv');
+
+// коммуникаторы
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=14&grupp_kod=110484&kategory=6387&grupp=%D2%C5%CB%C5%D4%CE%CD%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$orionMobKOMM = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=14&grupp_kod=110484&kategory=6387&grupp=%D2%C5%CB%C5%D4%CE%CD%DB&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000',"tmp/optvideo/mob_kom", 1 );
+$allFNames [] = $orionMobKOMM ;
+$orionMobKOMM_vls = parseFArray ( $orionMobKOMM, 'mob_kom' );
+$all_vls=array_merge ( $all_vls, $orionMobKOMM_vls  );
+storeCVS($orionMobKOMM_vls  ,$objFields,$csvHeader,'./tmp/optvideo_mobkom.csv');
+
+// мультиварки и пароварки
+// http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=51&grupp_kod=2526&kategory=123774&grupp=%D2%C5%D5%CD%C8%CA%C0%20%C4%CB%DF%20%CA%D3%D5%CD%C8&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000
+$orionParoMultiVarki = loadRazdel ( 'http://optvideo.com/new_design/new_kat/katalog.php?tab=3&selind_sort=2&sort_otbor=3&count_fl=51&grupp_kod=2526&kategory=123774&grupp=%D2%C5%D5%CD%C8%CA%C0%20%C4%CB%DF%20%CA%D3%D5%CD%C8&brend_from_head=xxx&brend_osn=xxx&brend2fromaj=xxx&grupp2fromaj=xxx&otobr=1&selind_pstr=5&brend2=xxx&count_postr=1000',"tmp/optvideo/paro_multivarki", 1 );
+$allFNames [] = $orionParoMultiVarki ;
+$orionParoMultiVarki_vls = parseFArray ( $orionParoMultiVarki, 'paro_multi_vrki' );
+$all_vls=array_merge ( $all_vls, $orionParoMultiVarki_vls  );
+storeCVS($orionParoMultiVarki_vls  ,$objFields,$csvHeader,'./tmp/optvideo_paromultivarki.csv');
+
+
+
 storeCVS($all_vls,$objFields,$csvHeader,'./tmp/optvideo_all.csv');
 
 //print_r($allFNames);
